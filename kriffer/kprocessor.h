@@ -3,6 +3,10 @@
 #include <riffer.h>
 
 #include <utility.h>
+#include <nuistream.h>
+#include <nuidepthstream.h>
+#include <nuicolourstream.h>
+#include <nuiskeletonstream.h>
 
 namespace kfr {
 	using namespace rfr;
@@ -13,14 +17,10 @@ namespace kfr {
 		INuiSensor * pNuiSensor;
 
 		HRESULT hr;
-		HANDLE                  m_pDepthStreamHandle;
-		HANDLE                  m_hNextDepthFrameEvent;
 
-		HANDLE                  m_pColourStreamHandle;
-		HANDLE                  m_hNextColourFrameEvent;
-
-		HANDLE                  m_pSkeletonStreamHandle;
-		HANDLE                  m_hNextSkeletonFrameEvent;
+		NuiDepthStream*			depth_stream;
+		NuiColourStream*		colour_stream;
+		NuiSkeletonStream*		skeleton_stream;
 
 		KProcessor(int k_index, CaptureSession _cs) {
 			cs = _cs;
@@ -48,40 +48,20 @@ namespace kfr {
 				| NUI_INITIALIZE_FLAG_USES_AUDIO);
 			if (SUCCEEDED(hr))
 			{
-				// Create an event that will be signaled when depth data is available
-				m_hNextDepthFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-				// Open a depth image stream to receive depth frames
-				hr = pNuiSensor->NuiImageStreamOpen(
-					NUI_IMAGE_TYPE_DEPTH,
-					NUI_IMAGE_RESOLUTION_640x480,
-					0,
-					2,
-					m_hNextDepthFrameEvent,
-					&m_pDepthStreamHandle);
+				depth_stream = new NuiDepthStream(pNuiSensor);
+				colour_stream = new NuiColourStream(pNuiSensor);
+				skeleton_stream = new NuiSkeletonStream(pNuiSensor);
 
-				// Create an event that will be signaled when depth data is available
-				m_hNextColourFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-				// Open a colour image stream to receive colour frames
-				hr = pNuiSensor->NuiImageStreamOpen(
-					NUI_IMAGE_TYPE_COLOR,
-					NUI_IMAGE_RESOLUTION_640x480,
-					0,
-					2,
-					m_hNextColourFrameEvent,
-					&m_pColourStreamHandle);
-
-				// Create an event that will be signaled when depth data is available
-				m_hNextSkeletonFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-				DWORD flags = 0;
-				//http://msdn.microsoft.com/en-us/library/nuisensor.inuisensor.nuiskeletontrackingenable.aspx
-				/*(m_seated ? NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT : 0) | (m_near ? NUI_SKELETON_TRACKING_FLAG_ENABLE_IN_NEAR_RANGE : 0)
-                | (ChooserModeDefault != m_chooserMode ? NUI_SKELETON_TRACKING_FLAG_TITLE_SETS_TRACKED_SKELETONS : 0);*/
-				pNuiSensor->NuiSkeletonTrackingEnable(m_hNextSkeletonFrameEvent, flags);
+				depth_stream->init();
+				colour_stream->init();
+				skeleton_stream->init();
 			}
 		}
 
+		//TODO create riffer chunks below.
+		//See KinectExplorer-D2D
 		void ProcessDepth() {
-			//retrieve Depth Data from Stream
+
 		}
 		void ProcessColor() {
 
@@ -91,15 +71,15 @@ namespace kfr {
 		}
 
 		void update() {
-			if ( WAIT_OBJECT_0 == WaitForSingleObject(m_hNextDepthFrameEvent, 0) )
+			if (WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
 			{
 				ProcessDepth();
 			}
-			if (WAIT_OBJECT_0 == WaitForSingleObject(m_hNextColourFrameEvent, 0))
+			if (WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
 			{
 				ProcessColor();
 			}
-			if (WAIT_OBJECT_0 == WaitForSingleObject(m_hNextSkeletonFrameEvent, 0))
+			if (WAIT_OBJECT_0 == WaitForSingleObject(skeleton_stream->frameEvent, 0))
 			{
 				ProcessSkeleton();
 			}
@@ -108,9 +88,10 @@ namespace kfr {
 		void stop() {
 			//stop pushing to capture session and wrap up.
 			//capture session stays open.
-			CloseHandle(m_hNextDepthFrameEvent);
-			CloseHandle(m_hNextColourFrameEvent);
-			CloseHandle(m_hNextSkeletonFrameEvent);
+			depth_stream->close();
+			colour_stream->close();
+			skeleton_stream->close();
+
 			SafeRelease(pNuiSensor);
 		}
 	};
