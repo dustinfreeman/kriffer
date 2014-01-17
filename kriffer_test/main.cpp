@@ -30,13 +30,13 @@ void test_kinect_write() {
 
 		kp.push_back(kfr::KProcessor(i, cs[i])); //get ith Kinect and assign to ith capture session.
 
-		//break; //for now, break after 1.
+		break; //for now, break after 1.
 	}
 	//now, the KinectProcessor should be writing frames to the capture session!
 	
 	Sleep(3000); //Windows API thread sleep.
 
-	for (int i = 0; i < num_kinects; i++) {
+	for (int i = 0; i < kp.size(); i++) {
 		kp[i].stop();
 		cs[i].close();
 	}
