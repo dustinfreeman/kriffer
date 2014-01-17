@@ -15,6 +15,8 @@ void test_kinect_write() {
 	if (num_kinects < 1) {
 		std::cout << "No Kinects found.\n";
 		return;
+	} else {
+		std::cout << "Found " << num_kinects << " Kinects.\n";
 	}
 
 	std::vector<kfr::KProcessor> kp;
@@ -28,7 +30,7 @@ void test_kinect_write() {
 
 		kp.push_back(kfr::KProcessor(i, cs[i])); //get ith Kinect and assign to ith capture session.
 
-		break; //for now, break after 1.
+		//break; //for now, break after 1.
 	}
 	//now, the KinectProcessor should be writing frames to the capture session!
 	

@@ -4,10 +4,14 @@
 
 //C/C++ -> Preprocessor -> Preprocessor Definitions: WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)
 
+//Linker -> Input -> Additional Dependencies:  Kinect10.lib;
+
 #include <kprocessor.h>
 
 namespace kfr {
 	int get_num_kinects() {
-		return 0;
+		int iSensorCount = 0;
+		HRESULT hr = NuiGetSensorCount(&iSensorCount);
+		return iSensorCount;
 	}
 };
