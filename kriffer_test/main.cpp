@@ -13,7 +13,7 @@
 void test_kinect_write() {
 	int num_kinects = kfr::get_num_kinects();
 	if (num_kinects < 1) {
-		std::cout < "No Kinects found.\n";
+		std::cout << "No Kinects found.\n";
 		return;
 	}
 
