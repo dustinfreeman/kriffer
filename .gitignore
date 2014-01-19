@@ -1,3 +1,6 @@
+*.dat
+*.knt
+
 # Compiled Object files
 *.slo
 *.lo

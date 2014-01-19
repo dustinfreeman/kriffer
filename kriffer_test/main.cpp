@@ -6,6 +6,7 @@
 //NOTE: string and int concatenation is easier in C++11 with std::to_string
 
 #include <windows.h> //for threading.
+#include <time.h>
 
 #include <riffer.h>
 #include <kriffer.h>
@@ -34,7 +35,17 @@ void test_kinect_write() {
 	}
 	//now, the KinectProcessor should be writing frames to the capture session!
 	
-	Sleep(3000); //Windows API thread sleep.
+	int test_duration = 10; //seconds.
+	time_t start;	time_t end;
+	time(&start);	time(&end);
+	std::cout << "Running update() for " << test_duration << " seconds.\n";
+	while (difftime(end,start) < test_duration) {
+		time(&end);
+		for (int i = 0; i < kp.size(); i++) {
+			kp[i].update();
+			//std::cout << "Update Call!\n";
+		}
+	}
 
 	for (int i = 0; i < kp.size(); i++) {
 		kp[i].stop();

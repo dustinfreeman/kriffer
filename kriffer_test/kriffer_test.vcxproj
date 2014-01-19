@@ -76,7 +76,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\kriffer\lzfx\getopt.c" />
+    <ClCompile Include="..\kriffer\lzfx\lzfx.c" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kriffer\kprocessor.h" />
+    <ClInclude Include="..\kriffer\kriffer.h" />
+    <ClInclude Include="..\kriffer\lzfx\getopt.h" />
+    <ClInclude Include="..\kriffer\lzfx\lzfx.h" />
+    <ClInclude Include="..\kriffer\lzfx\unistd.h" />
+    <ClInclude Include="..\kriffer\nuicolourstream.h" />
+    <ClInclude Include="..\kriffer\nuidepthstream.h" />
+    <ClInclude Include="..\kriffer\nuiskeletonstream.h" />
+    <ClInclude Include="..\kriffer\nuistream.h" />
+    <ClInclude Include="..\kriffer\utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

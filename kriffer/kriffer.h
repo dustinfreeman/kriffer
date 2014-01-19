@@ -6,12 +6,18 @@
 
 //Linker -> Input -> Additional Dependencies:  Kinect10.lib;
 
+#include <riffer.h>
 #include <kprocessor.h>
 
 namespace kfr {
+	using namespace rfr;
+
 	int get_num_kinects() {
 		int iSensorCount = 0;
 		HRESULT hr = NuiGetSensorCount(&iSensorCount);
 		return iSensorCount;
 	}
 };
+
+
+

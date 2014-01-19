@@ -13,10 +13,54 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\kriffer">
+      <UniqueIdentifier>{40a23f95-8743-4959-9f96-38a48d8ea8af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\kriffer\lzfx">
+      <UniqueIdentifier>{54bdbcd1-4754-4171-a6b5-a23bfcaaaaec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\kriffer\lzfx\lzfx.c">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\lzfx\getopt.c">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kriffer\kprocessor.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\kriffer.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuistream.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuiskeletonstream.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuicolourstream.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuidepthstream.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\utility.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\lzfx\lzfx.h">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\lzfx\unistd.h">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\lzfx\getopt.h">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
