@@ -76,11 +76,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\kriffer\jpg\jpgd.cpp" />
+    <ClCompile Include="..\kriffer\jpg\jpge.cpp" />
     <ClCompile Include="..\kriffer\lzfx\getopt.c" />
     <ClCompile Include="..\kriffer\lzfx\lzfx.c" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\kriffer\jpg\jpgd.h" />
+    <ClInclude Include="..\kriffer\jpg\jpge.h" />
     <ClInclude Include="..\kriffer\kprocessor.h" />
     <ClInclude Include="..\kriffer\kriffer.h" />
     <ClInclude Include="..\kriffer\lzfx\getopt.h" />

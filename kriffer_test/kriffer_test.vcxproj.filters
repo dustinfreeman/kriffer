@@ -19,6 +19,9 @@
     <Filter Include="Source Files\kriffer\lzfx">
       <UniqueIdentifier>{54bdbcd1-4754-4171-a6b5-a23bfcaaaaec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\kriffer\jpg">
+      <UniqueIdentifier>{4a5defee-8fb8-4637-b0df-4932a6fd48ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -29,6 +32,12 @@
     </ClCompile>
     <ClCompile Include="..\kriffer\lzfx\getopt.c">
       <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\jpg\jpge.cpp">
+      <Filter>Source Files\kriffer\jpg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\jpg\jpgd.cpp">
+      <Filter>Source Files\kriffer\jpg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +70,12 @@
     </ClInclude>
     <ClInclude Include="..\kriffer\lzfx\getopt.h">
       <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\jpg\jpgd.h">
+      <Filter>Source Files\kriffer\jpg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\jpg\jpge.h">
+      <Filter>Source Files\kriffer\jpg</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

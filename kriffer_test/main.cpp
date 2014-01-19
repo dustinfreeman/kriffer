@@ -42,10 +42,12 @@ void test_kinect_write() {
 	while (difftime(end,start) < test_duration) {
 		time(&end);
 		for (int i = 0; i < kp.size(); i++) {
-			kp[i].update();
-			//std::cout << "Update Call!\n";
+			std::string new_frames = kp[i].update();
+			std::cout << new_frames;
 		}
+		std::cout << ",";
 	}
+	std::cout << "\n";
 
 	for (int i = 0; i < kp.size(); i++) {
 		kp[i].stop();

@@ -9,8 +9,9 @@
 
 #include <riffer.h>
 
-
 #include "lzfx\lzfx.h"
+#include "jpg\jpgd.h"
+#include "jpg\jpge.h"
 
 namespace kfr {
 	using namespace rfr;
@@ -118,7 +119,59 @@ namespace kfr {
 
 		//Method from KinectExplorer-D2D
 		void ProcessColor() {
+			Chunk colourChunk("colour frame");
+			add_current_time(&colourChunk);
 
+			NUI_IMAGE_FRAME imageFrame;
+
+			// Attempt to get the color frame
+			hr = pNuiSensor->NuiImageStreamGetNextFrame(colour_stream->streamHandle, 0, &imageFrame);
+			if (FAILED(hr))
+			{
+				std::cout << "Colour's NuiImageStreamGetNextFrame Failed.\n";
+				return;
+			}
+
+			INuiFrameTexture* pTexture = imageFrame.pFrameTexture;
+
+			// Lock the frame data so the Kinect knows not to modify it while we are reading it
+			NUI_LOCKED_RECT lockedRect;
+			pTexture->LockRect(0, &lockedRect, NULL, 0);
+
+			// Make sure we've received valid data
+			if (lockedRect.Pitch != 0)
+			{
+				add_resolution(&colourChunk, imageFrame.eResolution);
+
+				int padding_factor = 4;
+				/*unsigned*/ int olen = lockedRect.size*sizeof(BYTE)*padding_factor;
+				void* obuf = malloc(olen);
+				//http://code.google.com/p/jpeg-compressor/
+				bool result = jpge::compress_image_to_jpeg_file_in_memory(obuf, olen, 
+					*colourChunk.get_parameter<int>("width"),
+					*colourChunk.get_parameter<int>("height"),
+					4,
+					lockedRect.pBits);
+				//Colour format from Kinect:
+				//http://msdn.microsoft.com/en-us/library/jj131027.aspx
+				//X8R8G8B8
+				//DOES THIS NEED TO BE CONVERTED FOR JPEG?
+
+				if (!result) {
+					std::cout << "Problem with jpge compression. \n";
+				} else {
+					//QuadPart is to get int64 from LARGE_INTEGER
+					colourChunk.add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
+					colourChunk.add_parameter("colour image", obuf, olen); 
+
+					cs.add(colourChunk);
+				}
+				delete obuf;
+			}
+
+			// Unlock frame data
+			pTexture->UnlockRect(0);
+			pNuiSensor->NuiImageStreamReleaseFrame(colour_stream->streamHandle, &imageFrame);
 		}
 		void ProcessDepth() {
 			Chunk depthChunk("depth frame");
@@ -128,7 +181,7 @@ namespace kfr {
 			pNuiSensor->NuiImageStreamGetNextFrame(depth_stream->streamHandle, 0, &imageFrame);
 			if (FAILED(hr))
 			{
-				std::cout << "NuiImageStreamGetNextFrame Failed.\n";
+				std::cout << "Depth's NuiImageStreamGetNextFrame Failed.\n";
 				return;
 			}
 
@@ -158,14 +211,16 @@ namespace kfr {
 				if (h < 0) {
 					std::cout << "lzfx_compress failed.\n";
 					goto ReleaseTexture;
-				}
+				} else {
 				
-				add_resolution(&depthChunk, imageFrame.eResolution);
-				//QuadPart is to get int64 from LARGE_INTEGER
-				depthChunk.add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
-				depthChunk.add_parameter("depth image", obuf, olen); 
+					add_resolution(&depthChunk, imageFrame.eResolution);
+					//QuadPart is to get int64 from LARGE_INTEGER
+					depthChunk.add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
+					depthChunk.add_parameter("depth image", obuf, olen); 
 
-				cs.add(depthChunk);
+					cs.add(depthChunk);
+				}
+				delete obuf;
 			}
 
 		ReleaseTexture:
@@ -183,19 +238,24 @@ namespace kfr {
 
 		}
 
-		void update() {
+		std::string update() {
+			std::ostringstream new_frames;
 			if (WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
 			{
 				ProcessColor();
+				new_frames << "c";
 			}
 			if (WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
 			{
 				ProcessDepth();
+				new_frames << "d";
 			}
 			if (WAIT_OBJECT_0 == WaitForSingleObject(skeleton_stream->frameEvent, 0))
 			{
 				ProcessSkeleton();
+				new_frames << "s";
 			}
+			return new_frames.str();
 		}
 
 		void stop() {
