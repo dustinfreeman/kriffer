@@ -13,6 +13,9 @@
 #include "jpg\jpgd.h"
 #include "jpg\jpge.h"
 
+#define KINECT_MAX_USERS 6 
+//I'm annoyed I couldn't find the above in NuiApi.h
+
 namespace kfr {
 	using namespace rfr;
 
