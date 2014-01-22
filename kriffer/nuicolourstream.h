@@ -1,4 +1,5 @@
 #include <nuistream.h>
+#pragma once
 
 struct NuiColourStream : NuiStream {
 	NuiColourStream(INuiSensor * _pNuiSensor) { 

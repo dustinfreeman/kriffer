@@ -1,4 +1,7 @@
+#include <Windows.h>
 #include <Winbase.h> //for time functions.
+
+#include <sstream>
 
 #include <NuiApi.h>
 #include <utility.h>
@@ -12,6 +15,8 @@
 #include "lzfx\lzfx.h"
 #include "jpg\jpgd.h"
 #include "jpg\jpge.h"
+
+#pragma once
 
 namespace kfr {
 	using namespace rfr;

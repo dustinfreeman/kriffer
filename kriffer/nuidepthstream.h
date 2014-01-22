@@ -1,4 +1,5 @@
 #include <nuistream.h>
+#pragma once
 
 struct NuiDepthStream : NuiStream {
 	bool            m_nearMode;

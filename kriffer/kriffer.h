@@ -9,6 +9,8 @@
 #include <riffer.h>
 #include <kprocessor.h>
 
+#pragma once
+
 namespace kfr {
 	using namespace rfr;
 

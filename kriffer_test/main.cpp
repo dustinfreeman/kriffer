@@ -2,10 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <sstream>
+
 //NOTE: string and int concatenation is easier in C++11 with std::to_string
 
-#include <windows.h> //for threading.
 #include <time.h>
 
 #include <riffer.h>
@@ -55,8 +54,14 @@ void test_kinect_write() {
 	}
 }
 
+void test_kinect_read_write() {
+
+}
+
 int main() {
 	test_kinect_write();
+
+	test_kinect_read_write();
 
 	std::cout << "Finished all tests.\n";
 	while(true) { }

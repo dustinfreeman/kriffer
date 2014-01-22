@@ -1,4 +1,5 @@
 #include <nuistream.h>
+#pragma once
 
 struct NuiSkeletonStream : NuiStream {
 	NuiSkeletonStream(INuiSensor * _pNuiSensor) { 
