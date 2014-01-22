@@ -172,6 +172,10 @@ namespace kfr {
 					colourChunk.add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
 					colourChunk.add_parameter("colour image", obuf, olen); 
 
+					//set last colour
+					delete _last_colour;
+					_last_colour = colourChunk;
+
 					cs.add(colourChunk);
 				}
 				delete obuf;
@@ -227,6 +231,10 @@ namespace kfr {
 					//QuadPart is to get int64 from LARGE_INTEGER
 					depthChunk.add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
 					depthChunk.add_parameter("depth image", obuf, olen); 
+
+					//set last depth
+					delete _last_depth;
+					_last_depth = depthChunk;
 
 					cs.add(depthChunk);
 				}
