@@ -83,6 +83,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\kriffer\img_chunk.h" />
     <ClInclude Include="..\kriffer\jpg\jpgd.h" />
     <ClInclude Include="..\kriffer\jpg\jpge.h" />
     <ClInclude Include="..\kriffer\kprocessor.h" />

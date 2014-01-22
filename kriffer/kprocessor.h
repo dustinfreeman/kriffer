@@ -11,6 +11,7 @@
 #include <nuiskeletonstream.h>
 
 #include <riffer.h>
+#include <img_chunk.h>
 
 #include "lzfx\lzfx.h"
 #include "jpg\jpgd.h"
@@ -34,8 +35,8 @@ namespace kfr {
 		NuiColourStream*		colour_stream;
 		NuiSkeletonStream*		skeleton_stream;
 
-		ImgChunk _last_depth;
-		ImgChunk _last_colour;
+		ImgChunk* _last_depth;
+		ImgChunk* _last_colour;
 
 		void register_tags() {
 			//ensures tags are registered with riffer
@@ -128,8 +129,8 @@ namespace kfr {
 
 		//Method from KinectExplorer-D2D
 		void ProcessColor() {
-			Chunk colourChunk("colour frame");
-			add_current_time(&colourChunk);
+			ImgChunk* colourChunk = new ImgChunk("colour frame");
+			add_current_time(colourChunk);
 
 			NUI_IMAGE_FRAME imageFrame;
 
@@ -150,19 +151,19 @@ namespace kfr {
 			// Make sure we've received valid data
 			if (lockedRect.Pitch != 0)
 			{
-				add_resolution(&colourChunk, imageFrame.eResolution);
+				add_resolution(colourChunk, imageFrame.eResolution);
 
-				colourChunk.assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
+				colourChunk->assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
 
 				int padding_factor = 4;
-				/*unsigned*/ int olen = colourChunk.image_size*padding_factor;
+				/*unsigned*/ int olen = colourChunk->image_size*padding_factor;
 				void* obuf = malloc(olen);
 				//http://code.google.com/p/jpeg-compressor/
 				bool result = jpge::compress_image_to_jpeg_file_in_memory(obuf, olen, 
-					*colourChunk.get_parameter<int>("width"),
-					*colourChunk.get_parameter<int>("height"),
+					*colourChunk->get_parameter<int>("width"),
+					*colourChunk->get_parameter<int>("height"),
 					4,
-					colourChunk.image);
+					colourChunk->image);
 				//Colour format from Kinect:
 				//http://msdn.microsoft.com/en-us/library/jj131027.aspx
 				//X8R8G8B8
@@ -172,14 +173,14 @@ namespace kfr {
 					std::cout << "Problem with jpge compression. \n";
 				} else {
 					//QuadPart is to get int64 from LARGE_INTEGER
-					colourChunk.add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
-					colourChunk.add_parameter("colour image", obuf, olen); 
+					colourChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
+					colourChunk->add_parameter("colour image", obuf, olen); 
 
 					//set last colour
 					delete _last_colour;
 					_last_colour = colourChunk;
 
-					cs.add(colourChunk);
+					cs.add(*colourChunk);
 				}
 				delete obuf;
 			}
@@ -189,8 +190,8 @@ namespace kfr {
 			pNuiSensor->NuiImageStreamReleaseFrame(colour_stream->streamHandle, &imageFrame);
 		}
 		void ProcessDepth() {
-			ImgChunk depthChunk("depth frame");
-			add_current_time(&depthChunk);
+			ImgChunk* depthChunk = new ImgChunk("depth frame");
+			add_current_time(depthChunk);
 
 			NUI_IMAGE_FRAME imageFrame;
 			pNuiSensor->NuiImageStreamGetNextFrame(depth_stream->streamHandle, 0, &imageFrame);
@@ -219,27 +220,27 @@ namespace kfr {
 				// Convert depth data to color image and copy to image buffer
 				//m_imageBuffer.CopyDepth(lockedRect.pBits, lockedRect.size, nearMode, m_depthTreatment);
 
-				depthChunk.assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
+				depthChunk->assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
 
 				int padding_factor = 4;
-				unsigned int olen = depthChunk.image_size*padding_factor;
+				unsigned int olen = depthChunk->image_size*padding_factor;
 				void* obuf = malloc(olen);
-				int h = lzfx_compress(depthChunk.image, depthChunk.image_size, obuf, &olen);
+				int h = lzfx_compress(depthChunk->image, depthChunk->image_size, obuf, &olen);
 				if (h < 0) {
 					std::cout << "lzfx_compress failed.\n";
 					goto ReleaseTexture;
 				} else {
 				
-					add_resolution(&depthChunk, imageFrame.eResolution);
+					add_resolution(depthChunk, imageFrame.eResolution);
 					//QuadPart is to get int64 from LARGE_INTEGER
-					depthChunk.add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
-					depthChunk.add_parameter("depth image", obuf, olen); 
+					depthChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
+					depthChunk->add_parameter("depth image", obuf, olen); 
 
 					//set last depth
 					delete _last_depth;
 					_last_depth = depthChunk;
 
-					cs.add(depthChunk);
+					cs.add(*depthChunk);
 				}
 				delete obuf;
 			}
@@ -279,11 +280,11 @@ namespace kfr {
 			return new_frames.str();
 		}
 
-		ImgChunk last_depth() {
+		ImgChunk* last_depth() {
 			return _last_depth;
 		}
 
-		ImgChunk last_colour() {
+		ImgChunk* last_colour() {
 			return _last_colour;
 		}
 

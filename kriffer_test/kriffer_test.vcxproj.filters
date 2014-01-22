@@ -77,5 +77,8 @@
     <ClInclude Include="..\kriffer\jpg\jpge.h">
       <Filter>Source Files\kriffer\jpg</Filter>
     </ClInclude>
+    <ClInclude Include="..\kriffer\img_chunk.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
