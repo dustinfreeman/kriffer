@@ -31,6 +31,9 @@ namespace kfr {
 		NuiColourStream*		colour_stream;
 		NuiSkeletonStream*		skeleton_stream;
 
+		ImgChunk _last_depth;
+		ImgChunk _last_colour;
+
 		void register_tags() {
 			//ensures tags are registered with riffer
 			tags::register_tag("width", "WDTH", INT_TYPE);
@@ -146,15 +149,17 @@ namespace kfr {
 			{
 				add_resolution(&colourChunk, imageFrame.eResolution);
 
+				colourChunk.assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
+
 				int padding_factor = 4;
-				/*unsigned*/ int olen = lockedRect.size*sizeof(BYTE)*padding_factor;
+				/*unsigned*/ int olen = colourChunk.image_size*padding_factor;
 				void* obuf = malloc(olen);
 				//http://code.google.com/p/jpeg-compressor/
 				bool result = jpge::compress_image_to_jpeg_file_in_memory(obuf, olen, 
 					*colourChunk.get_parameter<int>("width"),
 					*colourChunk.get_parameter<int>("height"),
 					4,
-					lockedRect.pBits);
+					colourChunk.image);
 				//Colour format from Kinect:
 				//http://msdn.microsoft.com/en-us/library/jj131027.aspx
 				//X8R8G8B8
@@ -177,7 +182,7 @@ namespace kfr {
 			pNuiSensor->NuiImageStreamReleaseFrame(colour_stream->streamHandle, &imageFrame);
 		}
 		void ProcessDepth() {
-			Chunk depthChunk("depth frame");
+			ImgChunk depthChunk("depth frame");
 			add_current_time(&depthChunk);
 
 			NUI_IMAGE_FRAME imageFrame;
@@ -207,10 +212,12 @@ namespace kfr {
 				// Convert depth data to color image and copy to image buffer
 				//m_imageBuffer.CopyDepth(lockedRect.pBits, lockedRect.size, nearMode, m_depthTreatment);
 
+				depthChunk.assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
+
 				int padding_factor = 4;
-				unsigned int olen = lockedRect.size*sizeof(BYTE)*padding_factor;
+				unsigned int olen = depthChunk.image_size*padding_factor;
 				void* obuf = malloc(olen);
-				int h = lzfx_compress(lockedRect.pBits, lockedRect.size, obuf, &olen);
+				int h = lzfx_compress(depthChunk.image, depthChunk.image_size, obuf, &olen);
 				if (h < 0) {
 					std::cout << "lzfx_compress failed.\n";
 					goto ReleaseTexture;
@@ -259,6 +266,14 @@ namespace kfr {
 				new_frames << "s";
 			}
 			return new_frames.str();
+		}
+
+		ImgChunk last_depth() {
+			return _last_depth;
+		}
+
+		ImgChunk last_colour() {
+			return _last_colour;
 		}
 
 		void stop() {
