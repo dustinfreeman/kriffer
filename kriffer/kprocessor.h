@@ -57,6 +57,9 @@ namespace kfr {
 			cs = _cs;
 			k_index = _k_index;
 
+			_last_depth = nullptr;
+			_last_colour = nullptr;
+
 			register_tags();
 			cs.index_by("timestamp");
 
@@ -177,7 +180,8 @@ namespace kfr {
 					colourChunk->add_parameter("colour image", obuf, olen); 
 
 					//set last colour
-					delete _last_colour;
+					if (_last_colour != nullptr)
+						delete _last_colour;
 					_last_colour = colourChunk;
 
 					cs.add(*colourChunk);
@@ -237,7 +241,8 @@ namespace kfr {
 					depthChunk->add_parameter("depth image", obuf, olen); 
 
 					//set last depth
-					delete _last_depth;
+					if (_last_depth != nullptr)
+						delete _last_depth;
 					_last_depth = depthChunk;
 
 					cs.add(*depthChunk);
