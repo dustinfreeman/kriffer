@@ -24,7 +24,7 @@ namespace kfr {
 	using namespace rfr;
 
 	struct KProcessor {
-		CaptureSession cs;
+		CaptureSession* cs;
 		int k_index;
 
 		INuiSensor * pNuiSensor;
@@ -53,15 +53,15 @@ namespace kfr {
 
 		}
 
-		KProcessor(int _k_index, CaptureSession _cs) {
-			cs = _cs;
+		KProcessor(int _k_index, std::string _filename = "./capture.dat", bool overwrite = true) {
+			cs = new CaptureSession(_filename, overwrite);
 			k_index = _k_index;
 
 			_last_depth = nullptr;
 			_last_colour = nullptr;
 
 			register_tags();
-			cs.index_by("timestamp");
+			cs->index_by("timestamp");
 
 			//The following from DepthBasics-D2D CDepthBasics::CreateFirstConnected()
 			//open kinect
@@ -94,6 +94,10 @@ namespace kfr {
 				colour_stream->init();
 				skeleton_stream->init();
 			}
+		}
+
+		~KProcessor() {
+			delete cs;
 		}
 
 		void add_current_time(Chunk* chunk) {
@@ -184,7 +188,7 @@ namespace kfr {
 						delete _last_colour;
 					_last_colour = colourChunk;
 
-					cs.add(*colourChunk);
+					cs->add(*colourChunk);
 				}
 				delete obuf;
 			}
@@ -245,7 +249,7 @@ namespace kfr {
 						delete _last_depth;
 					_last_depth = depthChunk;
 
-					cs.add(*depthChunk);
+					cs->add(*depthChunk);
 				}
 				delete obuf;
 			}
@@ -299,6 +303,8 @@ namespace kfr {
 			colour_stream->close();
 			depth_stream->close();
 			skeleton_stream->close();
+
+			cs->close();
 
 			SafeRelease(pNuiSensor);
 		}
