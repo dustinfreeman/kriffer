@@ -19,16 +19,13 @@ void test_kinect_write() {
 		std::cout << "Found " << num_kinects << " Kinects.\n";
 	}
 
-	std::vector<kfr::KProcessor> kp;
-	std::vector<rfr::CaptureSession> cs;
+	std::vector<kfr::KProcessor*> kp;
 
 	for (int i = 0; i < num_kinects; i++) {
 		std::ostringstream capture_file_name;
 		capture_file_name << "capture" << i << ".knt";
 
-		cs.push_back(rfr::CaptureSession(capture_file_name.str()));
-
-		kp.push_back(kfr::KProcessor(i, cs[i])); //get ith Kinect and assign to ith capture session.
+		kp.push_back(new kfr::KProcessor(i, capture_file_name.str())); //get ith Kinect
 
 		break; //for now, break after 1.
 	}
@@ -41,7 +38,7 @@ void test_kinect_write() {
 	while (difftime(end,start) < test_duration) {
 		time(&end);
 		for (int i = 0; i < kp.size(); i++) {
-			std::string new_frames = kp[i].update();
+			std::string new_frames = kp[i]->update();
 			std::cout << new_frames;
 		}
 		std::cout << ",";
@@ -49,8 +46,7 @@ void test_kinect_write() {
 	std::cout << "\n";
 
 	for (int i = 0; i < kp.size(); i++) {
-		kp[i].stop();
-		cs[i].close();
+		kp[i]->stop();
 	}
 }
 
