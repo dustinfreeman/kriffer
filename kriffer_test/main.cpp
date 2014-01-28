@@ -62,6 +62,23 @@ void test_kinect_write() {
 	}
 }
 
+void test_basic() {
+	kfr::KProcessor kp(-1, "capture_basic.dat");
+
+	kfr::Chunk frame0;
+	int64_t timestamp0 = 1;
+	frame0.add_parameter("timestamp", timestamp0);
+	kp.cs->add(frame0);
+
+	kfr::Chunk frame1;
+	int64_t timestamp1 = 2;
+	frame1.add_parameter("timestamp", timestamp1);
+	kp.cs->add(frame1);
+
+
+
+}
+
 void test_kinect_read_write() {
 	//open KProcessor without kinect.
 	//create colour images and artifically add jpeg to k capture session
@@ -96,7 +113,9 @@ void test_kinect_read_write() {
 	//fetch and compare
 	kfr::ImgChunk* fetched_chunk = kp.get_colour(timestamp);
 
-	std::cout << "fetched_chunk timestamp " << fetched_chunk->get_parameter<int64_t>("timestamp") << "\n";
+	int64_t fetch_ts = *fetched_chunk->get_parameter<int64_t>("timestamp");
+	if (timestamp != fetch_ts)
+		std::cout << "fetched_chunk timestamp " << fetch_ts << "\n";
 
 	unsigned int comp_length;
 	unsigned int comp_length_2;
@@ -115,6 +134,8 @@ void test_kinect_read_write() {
 
 int main() {
 	//test_kinect_write();
+
+	test_basic();
 
 	test_kinect_read_write();
 

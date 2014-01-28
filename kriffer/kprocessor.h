@@ -65,6 +65,12 @@ namespace kfr {
 			_last_depth = nullptr;
 			_last_colour = nullptr;
 
+			colour_stream = nullptr;
+			depth_stream = nullptr;
+			skeleton_stream = nullptr;
+
+			pNuiSensor = nullptr;
+
 			register_tags();
 			cs->index_by("timestamp");
 
@@ -107,13 +113,13 @@ namespace kfr {
 			delete cs;
 		}
 
-		static __int64 get_current_time() {
+		static int64_t get_current_time() {
 			FILETIME time; GetSystemTimeAsFileTime(&time);
 			//Contains a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601 (UTC).
 			
 			//conversion:
 			LARGE_INTEGER foo;
-			__int64 bar;
+			int64_t bar;
 			foo.HighPart = time.dwHighDateTime;
 			foo.LowPart = time.dwLowDateTime;
 			bar = foo.QuadPart;
@@ -295,7 +301,7 @@ namespace kfr {
 			return _last_colour;
 		}
 
-		ImgChunk* get_colour(__int64 ts) {
+		ImgChunk* get_colour(int64_t ts) {
 			ImgChunk* colourChunk = new ImgChunk();
 			//std::string tag_filter = tags::get_tag("colour frame");
 			cs->get_at_index(colourChunk, "timestamp", ts); //, tag_filter);
@@ -323,9 +329,12 @@ namespace kfr {
 		void stop() {
 			//stop pushing to capture session and wrap up.
 			//capture session stays open.
-			colour_stream->close();
-			depth_stream->close();
-			skeleton_stream->close();
+			if (colour_stream)
+				colour_stream->close();
+			if (depth_stream)
+				depth_stream->close();
+			if (skeleton_stream)
+				skeleton_stream->close();
 
 			cs->close();
 
