@@ -3,6 +3,8 @@
 
 #include <sstream>
 
+#include <stdint.h>
+
 #include <NuiApi.h>
 #include <utility.h>
 #include <nuistream.h>
@@ -25,7 +27,8 @@ namespace kfr {
 
 	using namespace rfr;
 
-	struct KProcessor {
+	class KProcessor {
+	public:
 		CaptureSession* cs;
 		int k_index;
 
@@ -104,7 +107,7 @@ namespace kfr {
 			delete cs;
 		}
 
-		void add_current_time(Chunk* chunk) {
+		static __int64 get_current_time() {
 			FILETIME time; GetSystemTimeAsFileTime(&time);
 			//Contains a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601 (UTC).
 			
@@ -114,7 +117,12 @@ namespace kfr {
 			foo.HighPart = time.dwHighDateTime;
 			foo.LowPart = time.dwLowDateTime;
 			bar = foo.QuadPart;
-			chunk->add_parameter("timestamp", bar);
+
+			return bar;
+		}
+
+		void add_current_time(Chunk* chunk) {
+			chunk->add_parameter("timestamp", get_current_time());
 		}
 
 		void add_resolution(Chunk* chunk, int resolution) {
@@ -287,7 +295,7 @@ namespace kfr {
 			return _last_colour;
 		}
 
-		ImgChunk* get_colour(long ts) {
+		ImgChunk* get_colour(__int64 ts) {
 			ImgChunk* colourChunk = new ImgChunk();
 			//std::string tag_filter = tags::get_tag("colour frame");
 			cs->get_at_index(colourChunk, "timestamp", ts); //, tag_filter);
