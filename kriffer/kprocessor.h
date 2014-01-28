@@ -14,13 +14,15 @@
 #include <img_chunk.h>
 
 #include "lzfx\lzfx.h"
-#include "jpg\jpgd.h"
-#include "jpg\jpge.h"
+
 
 #pragma once
 #define KINECT_MAX_USERS 6 
 //I'm annoyed I couldn't find the above in NuiApi.h
+
 namespace kfr {
+	
+
 	using namespace rfr;
 
 	struct KProcessor {
@@ -50,12 +52,12 @@ namespace kfr {
 			
 			tags::register_tag("colour frame", "CLUR", CHUNK_TYPE);
 			tags::register_tag("colour image", "CLRI", CHAR_PTR_TYPE);
-
 		}
 
 		KProcessor(int _k_index, std::string _filename = "./capture.dat", bool overwrite = true) {
 			cs = new CaptureSession(_filename, overwrite);
 			k_index = _k_index;
+			//-ve k_index indicates not to open a Kinect. for testing.
 
 			_last_depth = nullptr;
 			_last_colour = nullptr;
@@ -63,36 +65,38 @@ namespace kfr {
 			register_tags();
 			cs->index_by("timestamp");
 
-			//The following from DepthBasics-D2D CDepthBasics::CreateFirstConnected()
-			//open kinect
-			hr = NuiCreateSensorByIndex(k_index, &pNuiSensor);
-			if (FAILED(hr))
-			{
-				std::cout << "Could not open Kinect " << k_index << "\n";
-			}
+			if (k_index >= 0) {
+				//The following from DepthBasics-D2D CDepthBasics::CreateFirstConnected()
+				//open kinect
+				hr = NuiCreateSensorByIndex(k_index, &pNuiSensor);
+				if (FAILED(hr))
+				{
+					std::cout << "Could not open Kinect " << k_index << "\n";
+				}
 
-			// Get the status of the sensor, and if connected, then we can initialize it
-			hr = pNuiSensor->NuiStatus();
-			if (S_OK != hr)
-			{
-				std::cout << "Some error with Kinect " << k_index << "\n";
-			}
+				// Get the status of the sensor, and if connected, then we can initialize it
+				hr = pNuiSensor->NuiStatus();
+				if (S_OK != hr)
+				{
+					std::cout << "Some error with Kinect " << k_index << "\n";
+				}
 
-			//initialize
-			hr = pNuiSensor->NuiInitialize(
-				NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX
-				| NUI_INITIALIZE_FLAG_USES_SKELETON
-				| NUI_INITIALIZE_FLAG_USES_COLOR
-				| NUI_INITIALIZE_FLAG_USES_AUDIO);
-			if (SUCCEEDED(hr))
-			{
-				depth_stream = new NuiDepthStream(pNuiSensor);
-				colour_stream = new NuiColourStream(pNuiSensor);
-				skeleton_stream = new NuiSkeletonStream(pNuiSensor);
+				//initialize
+				hr = pNuiSensor->NuiInitialize(
+					NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX
+					| NUI_INITIALIZE_FLAG_USES_SKELETON
+					| NUI_INITIALIZE_FLAG_USES_COLOR
+					| NUI_INITIALIZE_FLAG_USES_AUDIO);
+				if (SUCCEEDED(hr))
+				{
+					depth_stream = new NuiDepthStream(pNuiSensor);
+					colour_stream = new NuiColourStream(pNuiSensor);
+					skeleton_stream = new NuiSkeletonStream(pNuiSensor);
 
-				depth_stream->init();
-				colour_stream->init();
-				skeleton_stream->init();
+					depth_stream->init();
+					colour_stream->init();
+					skeleton_stream->init();
+				}
 			}
 		}
 
@@ -160,37 +164,20 @@ namespace kfr {
 			{
 				add_resolution(colourChunk, imageFrame.eResolution);
 
+				//QuadPart is to get int64 from LARGE_INTEGER
+				colourChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
+
+				//compresses the colour image.
 				colourChunk->assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
 
-				int padding_factor = 4;
-				/*unsigned*/ int olen = colourChunk->image_size*padding_factor;
-				void* obuf = malloc(olen);
-				//http://code.google.com/p/jpeg-compressor/
-				bool result = jpge::compress_image_to_jpeg_file_in_memory(obuf, olen, 
-					*colourChunk->get_parameter<int>("width"),
-					*colourChunk->get_parameter<int>("height"),
-					4,
-					colourChunk->image);
-				//Colour format from Kinect:
-				//http://msdn.microsoft.com/en-us/library/jj131027.aspx
-				//X8R8G8B8
-				//DOES THIS NEED TO BE CONVERTED FOR JPEG?
-
-				if (!result) {
-					std::cout << "Problem with jpge compression. \n";
-				} else {
-					//QuadPart is to get int64 from LARGE_INTEGER
-					colourChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
-					colourChunk->add_parameter("colour image", obuf, olen); 
+				if(colourChunk->valid_compression) {
+					cs->add(*colourChunk);
 
 					//set last colour
 					if (_last_colour != nullptr)
 						delete _last_colour;
 					_last_colour = colourChunk;
-
-					cs->add(*colourChunk);
 				}
-				delete obuf;
 			}
 
 			// Unlock frame data
@@ -230,8 +217,7 @@ namespace kfr {
 
 				depthChunk->assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
 
-				int padding_factor = 4;
-				unsigned int olen = depthChunk->image_size*padding_factor;
+				unsigned int olen = depthChunk->image_size*PADDING_FACTOR;
 				void* obuf = malloc(olen);
 				int h = lzfx_compress(depthChunk->image, depthChunk->image_size, obuf, &olen);
 				if (h < 0) {
@@ -276,7 +262,11 @@ namespace kfr {
 				ProcessColor();
 				new_frames << "c";
 			}
-			if (WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
+
+			//HACK ONLY COLOUR FRAMES FOR NOW
+			// if we use other frame types, 
+			//	we will have to adjust indexing so it can filter a specific frame type.
+			/*if (WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
 			{
 				ProcessDepth();
 				new_frames << "d";
@@ -285,7 +275,7 @@ namespace kfr {
 			{
 				ProcessSkeleton();
 				new_frames << "s";
-			}
+			}*/
 			return new_frames.str();
 		}
 
@@ -295,6 +285,31 @@ namespace kfr {
 
 		ImgChunk* last_colour() {
 			return _last_colour;
+		}
+
+		ImgChunk* get_colour(long ts) {
+			ImgChunk* colourChunk = new ImgChunk();
+			//std::string tag_filter = tags::get_tag("colour frame");
+			cs->get_at_index(colourChunk, "timestamp", ts); //, tag_filter);
+
+			unsigned int comp_length;
+			const unsigned char* comp_data = (unsigned char*)colourChunk->get_parameter_by_tag_as_char_ptr<char*>(tags::get_tag("colour image"), &comp_length); 
+
+			if (comp_data) {
+				int w = *colourChunk->get_parameter<int>("width");
+				int h = *colourChunk->get_parameter<int>("height");
+				int actual_comps;
+				unsigned char * uncomp_img = jpgd::decompress_jpeg_image_from_memory(
+					comp_data, 
+					comp_length,
+					&w, &h, &actual_comps, 
+					NUM_CLR_CHANNELS);
+
+				if (uncomp_img)
+					colourChunk->assign_image(uncomp_img, w*h*NUM_CLR_CHANNELS*sizeof(BYTE));
+			}
+
+			return colourChunk;
 		}
 
 		void stop() {
