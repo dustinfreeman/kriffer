@@ -43,9 +43,11 @@ namespace kfr {
 			if (!result) {
 				std::cout << "Problem with jpge compression. \n";
 			} else {
-				add_parameter("colour image", obuf, olen); 
+				char* comp_img = new char[olen];
+				memcpy(comp_img, obuf, olen);
+				add_parameter("colour image", comp_img, olen); 
 			}
-			//delete obuf;
+			free(obuf);
 
 			valid_compression = result;
 		}
