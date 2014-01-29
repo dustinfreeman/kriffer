@@ -11,6 +11,7 @@
 #include <nuidepthstream.h>
 #include <nuicolourstream.h>
 #include <nuiskeletonstream.h>
+#include <nuiaudio.h>
 
 #include <riffer.h>
 #include <img_chunk.h>
@@ -39,9 +40,12 @@ namespace kfr {
 		NuiDepthStream*			depth_stream;
 		NuiColourStream*		colour_stream;
 		NuiSkeletonStream*		skeleton_stream;
+		NuiAudio*				audio_stream;
 
 		ImgChunk* _last_depth;
 		ImgChunk* _last_colour;
+
+		float _last_audio_angle;
 
 		void register_tags() {
 			//ensures tags are registered with riffer
@@ -64,10 +68,12 @@ namespace kfr {
 
 			_last_depth = nullptr;
 			_last_colour = nullptr;
+			_last_audio_angle = 0;
 
 			colour_stream = nullptr;
 			depth_stream = nullptr;
 			skeleton_stream = nullptr;
+			audio_stream = nullptr;
 
 			pNuiSensor = nullptr;
 
@@ -101,10 +107,12 @@ namespace kfr {
 					depth_stream = new NuiDepthStream(pNuiSensor);
 					colour_stream = new NuiColourStream(pNuiSensor);
 					skeleton_stream = new NuiSkeletonStream(pNuiSensor);
+					audio_stream = new NuiAudio(pNuiSensor);
 
 					depth_stream->init();
 					colour_stream->init();
 					skeleton_stream->init();
+					audio_stream->init();
 				}
 			}
 		}
@@ -269,7 +277,57 @@ namespace kfr {
 
 		}
 
+		void ProcessAudio() {
+			// Bottom portion of computed energy signal that will be discarded as noise.
+			// Only portion of signal above noise floor will be displayed.
+			const float cEnergyNoiseFloor = 0.2f;
+
+			ULONG cbProduced = 0;
+			BYTE *pProduced = NULL;
+			DWORD dwStatus = 0;
+			DMO_OUTPUT_DATA_BUFFER outputBuffer = {0};
+			outputBuffer.pBuffer = &audio_stream->buffer;
+
+			HRESULT hr = S_OK;
+
+			do
+			{
+				audio_stream->buffer.Init(0);
+				outputBuffer.dwStatus = 0;
+				hr = audio_stream->m_pDMO->ProcessOutput(0, 1, &outputBuffer, &dwStatus);
+				if (FAILED(hr))
+				{
+					std::cout << "Failed to process audio output. \n";
+					break;
+				}
+
+				if (hr == S_FALSE)
+				{
+					cbProduced = 0;
+				}
+				else
+				{
+					audio_stream->buffer.GetBufferAndLength(&pProduced, &cbProduced);
+				}
+
+				if (true) //cbProduced > 0)
+				{
+					double beamAngle, sourceAngle, sourceConfidence;
+
+					// Obtain beam angle from INuiAudioBeam afforded by microphone array
+					audio_stream->source->GetBeam(&beamAngle);
+					audio_stream->source->GetPosition(&sourceAngle, &sourceConfidence);
+
+					_last_audio_angle = sourceAngle;
+					//std::cout << _last_audio_angle << "\n";
+				}
+
+			} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
+		}
+
 		std::string update() {
+			ProcessAudio(); //I feel like this should be called more frequently?
+
 			std::ostringstream new_frames;
 			if (WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
 			{
@@ -326,6 +384,10 @@ namespace kfr {
 			return colourChunk;
 		}
 
+		float last_audio_angle() {
+			return _last_audio_angle;
+		}
+
 		void stop() {
 			//stop pushing to capture session and wrap up.
 			//capture session stays open.
@@ -335,6 +397,8 @@ namespace kfr {
 				depth_stream->close();
 			if (skeleton_stream)
 				skeleton_stream->close();
+			if (audio_stream)
+				audio_stream->close();
 
 			cs->close();
 
