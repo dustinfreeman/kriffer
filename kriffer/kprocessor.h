@@ -1,6 +1,11 @@
 #include <Windows.h>
 #include <Winbase.h> //for time functions.
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <tchar.h>
+
 #include <sstream>
 #include <streambuf>
 
@@ -24,8 +29,13 @@
 #define KINECT_MAX_USERS 6 
 //I'm annoyed I couldn't find the above in NuiApi.h
 
+void SignalHandler(int signal)
+{
+	printf("Signal %d",signal);
+	throw "!Access Violation!";
+}
+
 namespace kfr {
-	
 
 	using namespace rfr;
 
@@ -281,6 +291,10 @@ namespace kfr {
 
 		}
 
+
+		
+		typedef void (*SignalHandlerPointer)(int);
+
 		void ProcessAudio() {
 			ULONG cbProduced = 0;
 			BYTE *pProduced = NULL;
@@ -288,15 +302,32 @@ namespace kfr {
 			DMO_OUTPUT_DATA_BUFFER outputBuffer = {0};
 			outputBuffer.pBuffer = &audio_stream->buffer;
 
-			if (!output_audio_buffer)
-				return;
+			if (output_audio_buffer)
+				std::cout << "buffer pos: " << output_audio_buffer->tellp() << "\n";
 
 			HRESULT hr = S_OK;
+			std::cout << "loop ";
+
+			
 			do
 			{
 				audio_stream->buffer.Init(0);
 				outputBuffer.dwStatus = 0;
-				hr = audio_stream->m_pDMO->ProcessOutput(0, 1, &outputBuffer, &dwStatus);
+
+				//http://stackoverflow.com/a/918891/2518451
+				SignalHandlerPointer previousHandler;
+				previousHandler = signal(SIGSEGV , SignalHandler);
+				try {
+					//receive confusing access violation errors in line below
+					//catching by: http://stackoverflow.com/a/8234956/2518451
+					std::cout << "here ";
+					hr = audio_stream->m_pDMO->ProcessOutput(0, 1, &outputBuffer, &dwStatus);
+				} catch (char *e) {
+					std::cout << "Caught exception in ProcessAudio() " << e << "\n";
+					break;
+				}
+
+				std::cout << "there \n";
 
 				if (FAILED(hr))
 				{
@@ -324,8 +355,10 @@ namespace kfr {
 					_last_audio_angle = sourceAngle;
 					//std::cout << _last_audio_angle << "\n";
 
-					output_audio_buffer->write((const char*)pProduced, cbProduced);
-					std::cout << "writing to buffer " << cbProduced << "/" << output_audio_buffer->tellp() << "\n";
+					if (output_audio_buffer) {
+						output_audio_buffer->write((const char*)pProduced, cbProduced);
+						std::cout << "writing to buffer " << cbProduced << "/" << output_audio_buffer->tellp() << "\n";
+					}
 
 				}
 				//std::cout << ".";
