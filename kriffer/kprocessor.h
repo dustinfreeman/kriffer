@@ -2,6 +2,7 @@
 #include <Winbase.h> //for time functions.
 
 #include <sstream>
+#include <streambuf>
 
 #include <stdint.h>
 
@@ -46,6 +47,7 @@ namespace kfr {
 		ImgChunk* _last_colour;
 
 		float _last_audio_angle;
+		std::iostream *output_audio_buffer;
 
 		void register_tags() {
 			//ensures tags are registered with riffer
@@ -66,16 +68,18 @@ namespace kfr {
 			k_index = _k_index;
 			//-ve k_index indicates not to open a Kinect. for testing.
 
-			_last_depth = nullptr;
-			_last_colour = nullptr;
-			_last_audio_angle = 0;
+			pNuiSensor = nullptr;
 
 			colour_stream = nullptr;
 			depth_stream = nullptr;
 			skeleton_stream = nullptr;
 			audio_stream = nullptr;
 
-			pNuiSensor = nullptr;
+			output_audio_buffer = nullptr;
+
+			_last_depth = nullptr;
+			_last_colour = nullptr;
+			_last_audio_angle = 0;
 
 			register_tags();
 			cs->index_by("timestamp");
@@ -278,10 +282,9 @@ namespace kfr {
 		}
 
 		void ProcessAudio() {
-			// Bottom portion of computed energy signal that will be discarded as noise.
-			// Only portion of signal above noise floor will be displayed.
-			const float cEnergyNoiseFloor = 0.2f;
-
+			if (!output_audio_buffer)
+				return;
+			
 			ULONG cbProduced = 0;
 			BYTE *pProduced = NULL;
 			DWORD dwStatus = 0;
@@ -289,12 +292,12 @@ namespace kfr {
 			outputBuffer.pBuffer = &audio_stream->buffer;
 
 			HRESULT hr = S_OK;
-
 			do
 			{
 				audio_stream->buffer.Init(0);
 				outputBuffer.dwStatus = 0;
 				hr = audio_stream->m_pDMO->ProcessOutput(0, 1, &outputBuffer, &dwStatus);
+
 				if (FAILED(hr))
 				{
 					std::cout << "Failed to process audio output. \n";
@@ -310,7 +313,7 @@ namespace kfr {
 					audio_stream->buffer.GetBufferAndLength(&pProduced, &cbProduced);
 				}
 
-				if (true) //cbProduced > 0)
+				if (cbProduced > 0)
 				{
 					double beamAngle, sourceAngle, sourceConfidence;
 
@@ -320,9 +323,15 @@ namespace kfr {
 
 					_last_audio_angle = sourceAngle;
 					//std::cout << _last_audio_angle << "\n";
+
+					//HACK output_audio_buffer->write((const char*)pProduced, cbProduced);
+					//std::cout << "writing to buffer " << cbProduced << "\n";
+
 				}
+				//std::cout << ".";
 
 			} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
+			//std::cout << " -- \n";
 		}
 
 		std::string update() {

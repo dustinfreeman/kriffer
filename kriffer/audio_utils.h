@@ -37,6 +37,9 @@ static const WORD       AudioBlockAlign = 2;
 // Bits per audio sample in Kinect audio stream
 static const WORD       AudioBitsPerSample = 16;
 
+// Extra buffer space, if framerate is slow.
+//static const WORD       AudioBufferSpaceFactor = 5;
+
 
 /// <summary>
 /// IMediaBuffer implementation for a statically allocated buffer.
@@ -92,7 +95,7 @@ public:
 
 protected:
     // Statically allocated buffer used to hold audio data returned by IMediaObject
-    BYTE m_pData[AudioSamplesPerSecond * AudioBlockAlign];
+    BYTE m_pData[AudioSamplesPerSecond * AudioBlockAlign];// * AudioBufferSpaceFactor];
 
     // Amount of data currently being held in m_pData
     ULONG m_dataLength;

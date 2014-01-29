@@ -79,7 +79,6 @@ struct NuiAudio {
 		
 	}
 
-
 	void close() {
 
 	}
