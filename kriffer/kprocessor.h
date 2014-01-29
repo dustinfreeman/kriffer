@@ -282,14 +282,14 @@ namespace kfr {
 		}
 
 		void ProcessAudio() {
-			if (!output_audio_buffer)
-				return;
-			
 			ULONG cbProduced = 0;
 			BYTE *pProduced = NULL;
 			DWORD dwStatus = 0;
 			DMO_OUTPUT_DATA_BUFFER outputBuffer = {0};
 			outputBuffer.pBuffer = &audio_stream->buffer;
+
+			if (!output_audio_buffer)
+				return;
 
 			HRESULT hr = S_OK;
 			do
@@ -324,8 +324,8 @@ namespace kfr {
 					_last_audio_angle = sourceAngle;
 					//std::cout << _last_audio_angle << "\n";
 
-					//HACK output_audio_buffer->write((const char*)pProduced, cbProduced);
-					//std::cout << "writing to buffer " << cbProduced << "\n";
+					output_audio_buffer->write((const char*)pProduced, cbProduced);
+					std::cout << "writing to buffer " << cbProduced << "/" << output_audio_buffer->tellp() << "\n";
 
 				}
 				//std::cout << ".";
