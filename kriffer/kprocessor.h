@@ -437,8 +437,10 @@ namespace kfr {
 					&w, &h, &actual_comps, 
 					NUM_CLR_CHANNELS);
 
-				if (uncomp_img)
+				if (uncomp_img) {
 					colourChunk->assign_image(uncomp_img, w*h*NUM_CLR_CHANNELS*sizeof(BYTE));
+					delete[] uncomp_img;
+				}
 			}
 
 			return colourChunk;

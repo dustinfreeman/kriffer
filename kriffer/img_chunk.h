@@ -21,7 +21,7 @@ namespace kfr {
 			valid_compression = false;
 		}
 		~ImgChunk() {
-			delete image;
+			delete[] image;
 		}
 
 		void assign_image(BYTE* _image, int _size) {
