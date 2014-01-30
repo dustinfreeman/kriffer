@@ -204,8 +204,24 @@ namespace kfr {
 				//QuadPart is to get int64 from LARGE_INTEGER
 				colourChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
 
-				//compresses the colour image.
 				colourChunk->assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
+				
+				//compress image:
+				/*unsigned*/ int olen = colourChunk->image_size*PADDING_FACTOR;
+				void* obuf = malloc(olen);
+				//http://code.google.com/p/jpeg-compressor/
+				colourChunk->valid_compression = jpge::compress_image_to_jpeg_file_in_memory(obuf, olen, 
+					*colourChunk->get_parameter<int>("width"),
+					*colourChunk->get_parameter<int>("height"),
+					NUM_CLR_CHANNELS,
+					colourChunk->image);
+				//Colour format from Kinect:
+				//http://msdn.microsoft.com/en-us/library/jj131027.aspx
+				//X8R8G8B8
+				char* comp_img = new char[olen];
+				memcpy(comp_img, obuf, olen);
+				colourChunk->add_parameter("colour image", comp_img, olen); 
+				free(obuf);
 
 				if(colourChunk->valid_compression) {
 					cs->add(*colourChunk);
@@ -214,6 +230,8 @@ namespace kfr {
 					if (_last_colour != nullptr)
 						delete _last_colour;
 					_last_colour = colourChunk;
+				} else {
+					std::cout << "Problem with jpge compression. \n";
 				}
 			}
 
