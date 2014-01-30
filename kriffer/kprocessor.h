@@ -116,6 +116,7 @@ namespace kfr {
 					| NUI_INITIALIZE_FLAG_USES_SKELETON
 					| NUI_INITIALIZE_FLAG_USES_COLOR
 					| NUI_INITIALIZE_FLAG_USES_AUDIO);
+
 				if (SUCCEEDED(hr))
 				{
 					depth_stream = new NuiDepthStream(pNuiSensor);
@@ -306,8 +307,7 @@ namespace kfr {
 				std::cout << "buffer pos: " << output_audio_buffer->tellp() << "\n";
 
 			HRESULT hr = S_OK;
-			std::cout << "loop ";
-
+			//std::cout << "loop ";
 			
 			do
 			{
@@ -320,14 +320,14 @@ namespace kfr {
 				try {
 					//receive confusing access violation errors in line below
 					//catching by: http://stackoverflow.com/a/8234956/2518451
-					std::cout << "here ";
+					//std::cout << "here ";
 					hr = audio_stream->m_pDMO->ProcessOutput(0, 1, &outputBuffer, &dwStatus);
 				} catch (char *e) {
 					std::cout << "Caught exception in ProcessAudio() " << e << "\n";
 					break;
 				}
 
-				std::cout << "there \n";
+				//std::cout << "there \n";
 
 				if (FAILED(hr))
 				{
