@@ -29,7 +29,6 @@ struct NuiAudio {
 		{
 			std::cout << "Audio FAILED(hr) \n";
 		}
-
 		
 		hr = source->QueryInterface(IID_IMediaObject, (void**)&m_pDMO);
 		if (FAILED(hr))

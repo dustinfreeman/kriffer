@@ -315,6 +315,9 @@ namespace kfr {
 		typedef void (*SignalHandlerPointer)(int);
 
 		void ProcessAudio() {
+			
+			return; //HACK NO AUDIO FOR NOW.
+			
 			ULONG cbProduced = 0;
 			BYTE *pProduced = NULL;
 			DWORD dwStatus = 0;
