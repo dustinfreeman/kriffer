@@ -1,5 +1,6 @@
 #pragma once
 
+#include "audio_buffer.h"
 #include "audio_utils.h"
 #include "WASAPICapture.h"
 
@@ -9,14 +10,26 @@ struct NuiAudio {
 
 	// Audio source used to query Kinect audio beam and sound source angles.
     INuiAudioBeam*          source;
+	// Media object from which Kinect audio stream is captured.
+    IMediaObject*           m_pDMO;
+    // Property store used to configure Kinect audio properties.
+    IPropertyStore*         m_pPropertyStore;
+
+	// Buffer to hold captured audio data.
+    CStaticMediaBuffer buffer;
 
 	IMMDevice *device;
 
 	CWASAPICapture *capturer;
+	bool capturing;
 
 	HANDLE waveFile;
+	wchar_t waveFileName[MAX_PATH];
 
-	bool capturing;
+	std::string get_wave_filename() {
+		std::wstring ws(waveFileName);
+		return std::string(ws.begin(), ws.end());
+	}
 
 	NuiAudio(INuiSensor * _pNuiSensor = nullptr) {
 		pNuiSensor = _pNuiSensor;
@@ -37,7 +50,7 @@ struct NuiAudio {
 		{
 			if (capturer->Start(waveFile))
 			{
-				printf_s("Capturing audio data to file %S\nPress 's' to stop capturing.\n", waveFileName);
+				//printf_s("Capturing audio data to file %S\nPress 's' to stop capturing.\n", waveFileName);
 				capturing = true;
 				//do
 				//{
@@ -55,7 +68,7 @@ struct NuiAudio {
 		return hr;
 	}
 
-	void init() {
+	void init_source_beam() {
 		HRESULT hr;
 
 		// Get the audio source (for angle and beam stuff)
@@ -64,24 +77,72 @@ struct NuiAudio {
 		{
 			std::cout << "NuiGetAudioSource Failed \n";
 		}
+		hr = source->QueryInterface(IID_IMediaObject, (void**)&m_pDMO);
+		if (FAILED(hr))
+		{
+			std::cout << "Audio FAILED(hr) \n";
+		}
+		hr = source->QueryInterface(IID_IPropertyStore, (void**)&m_pPropertyStore);
+		if (FAILED(hr))
+		{
+			std::cout << "Audio FAILED(hr) \n";
+		}
+
+		// Set AEC-MicArray DMO system mode. This must be set for the DMO to work properly.
+		// Possible values are:
+		// SINGLE_CHANNEL_AEC = 0
+		// OPTIBEAM_ARRAY_ONLY = 2
+		// OPTIBEAM_ARRAY_AND_AEC = 4
+		// SINGLE_CHANNEL_NSAGC = 5
+		PROPVARIANT pvSysMode;
+		PropVariantInit(&pvSysMode);
+		pvSysMode.vt = VT_I4;
+		pvSysMode.lVal = (LONG)(2); // Use OPTIBEAM_ARRAY_ONLY setting. Set OPTIBEAM_ARRAY_AND_AEC instead if you expect to have sound playing from speakers.
+		m_pPropertyStore->SetValue(MFPKEY_WMAAECMA_SYSTEM_MODE, pvSysMode);
+		PropVariantClear(&pvSysMode);
+
+		// Set DMO output format
+
+		WAVEFORMATEX wfxOut = {AudioFormat, AudioChannels, AudioSamplesPerSecond, AudioAverageBytesPerSecond, AudioBlockAlign, AudioBitsPerSample, 0};
+		DMO_MEDIA_TYPE mt = {0};
+		hr = MoInitMediaType(&mt, sizeof(WAVEFORMATEX));
+		if (FAILED(hr))
+		{
+			std::cout << "Audio FAILED(hr) \n";
+		}
+
+		mt.majortype = MEDIATYPE_Audio;
+		mt.subtype = MEDIASUBTYPE_PCM;
+		mt.lSampleSize = 0;
+		mt.bFixedSizeSamples = TRUE;
+		mt.bTemporalCompression = FALSE;
+		mt.formattype = FORMAT_WaveFormatEx;	
+		memcpy_s(mt.pbFormat, sizeof(WAVEFORMATEX), &wfxOut, sizeof(WAVEFORMATEX));
+
+		hr = m_pDMO->SetOutputType(0, &mt, 0);
+		MoFreeMediaType(&mt);
+	}
+
+	void init() {
+		HRESULT hr;
+
+		init_source_beam();
 
 		//  Find the audio device corresponding to the kinect sensor.
         hr = GetMatchingAudioDevice(pNuiSensor, &device);
         if (SUCCEEDED(hr))
         {
-			//audio recording is initialized individually.
+			//audio recording is initialized separately.
         }
         else
         {
             printf_s("No matching audio device found!\n");
         }
-		
 	}
 
 	void start_index(int audio_index) {
 		HRESULT hr;
 
-		wchar_t waveFileName[MAX_PATH];
 		StringCchPrintfW(waveFileName, _countof(waveFileName), L"C:\\Users\\dustin\\Documents\\Code\\improv_remix\\improv_remix\\nuiaudio-%i.wav", audio_index);
 
 		// Create the wave file that will contain audio data

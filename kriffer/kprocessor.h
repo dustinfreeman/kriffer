@@ -275,16 +275,50 @@ namespace kfr {
 		typedef void (*SignalHandlerPointer)(int);
 
 		void ProcessAudio() {
-			
-			double beamAngle, sourceAngle, sourceConfidence;
+			ULONG cbProduced = 0;
+			BYTE *pProduced = NULL;
+			DWORD dwStatus = 0;
+			DMO_OUTPUT_DATA_BUFFER outputBuffer = {0};
+			outputBuffer.pBuffer = &audio_stream->buffer;
 
-			// Obtain beam angle from INuiAudioBeam afforded by microphone array
-			audio_stream->source->GetBeam(&beamAngle);
-			audio_stream->source->GetPosition(&sourceAngle, &sourceConfidence);
+			HRESULT hr = S_OK;
+			do
+			{
+				audio_stream->buffer.Init(0);
+				outputBuffer.dwStatus = 0;
 
-			_last_audio_angle = sourceAngle;
+				hr = audio_stream->m_pDMO->ProcessOutput(0, 1, &outputBuffer, &dwStatus);
 
-			std::cout << "_last_audio_angle " << _last_audio_angle << "\n";
+				if (FAILED(hr))
+				{
+					std::cout << "Failed to process audio output. \n";
+					break;
+				}
+
+				if (hr == S_FALSE)
+				{
+					cbProduced = 0;
+				}
+				else
+				{
+					audio_stream->buffer.GetBufferAndLength(&pProduced, &cbProduced);
+				}
+
+				if (cbProduced > 0)
+				{
+					double beamAngle, sourceAngle, sourceConfidence;
+
+					// Obtain beam angle from INuiAudioBeam afforded by microphone array
+					audio_stream->source->GetBeam(&beamAngle);
+					audio_stream->source->GetPosition(&sourceAngle, &sourceConfidence);
+
+					_last_audio_angle = sourceAngle;
+					//std::cout << _last_audio_angle << "\n";
+
+					//output_audio_buffer->write((const char*)pProduced, cbProduced);
+				}
+
+			} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
 		}
 
 		std::string update() {
