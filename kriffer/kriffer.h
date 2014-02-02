@@ -8,6 +8,7 @@
 
 #include <riffer.h>
 #include <kprocessor.h>
+#include <cvprocessor.h>
 
 #pragma once
 

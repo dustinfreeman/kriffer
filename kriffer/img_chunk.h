@@ -1,3 +1,5 @@
+#pragma once
+
 #include <riffer.h>
 
 #include "jpg\jpgd.h"
