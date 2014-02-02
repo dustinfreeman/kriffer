@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #include <NuiApi.h>
-#include <utility.h>
+#include <kr_util.h>
 #include <nuistream.h>
 #include <nuidepthstream.h>
 #include <nuicolourstream.h>
@@ -279,76 +279,15 @@ namespace kfr {
 
 		void ProcessAudio() {
 			
-			return; //HACK NO AUDIO FOR NOW.
-			
-			ULONG cbProduced = 0;
-			BYTE *pProduced = NULL;
-			DWORD dwStatus = 0;
-			DMO_OUTPUT_DATA_BUFFER outputBuffer = {0};
-			outputBuffer.pBuffer = &audio_stream->buffer;
+			double beamAngle, sourceAngle, sourceConfidence;
 
-			if (output_audio_buffer)
-				std::cout << "buffer pos: " << output_audio_buffer->tellp() << "\n";
+			// Obtain beam angle from INuiAudioBeam afforded by microphone array
+			audio_stream->source->GetBeam(&beamAngle);
+			audio_stream->source->GetPosition(&sourceAngle, &sourceConfidence);
 
-			HRESULT hr = S_OK;
-			//std::cout << "loop ";
-			
-			do
-			{
-				audio_stream->buffer.Init(0);
-				outputBuffer.dwStatus = 0;
+			_last_audio_angle = sourceAngle;
 
-				//http://stackoverflow.com/a/918891/2518451
-				SignalHandlerPointer previousHandler;
-				previousHandler = signal(SIGSEGV , SignalHandler);
-				try {
-					//receive confusing access violation errors in line below
-					//catching by: http://stackoverflow.com/a/8234956/2518451
-					//std::cout << "here ";
-					hr = audio_stream->m_pDMO->ProcessOutput(0, 1, &outputBuffer, &dwStatus);
-				} catch (char *e) {
-					std::cout << "Caught exception in ProcessAudio() " << e << "\n";
-					break;
-				}
-
-				//std::cout << "there \n";
-
-				if (FAILED(hr))
-				{
-					std::cout << "Failed to process audio output. \n";
-					break;
-				}
-
-				if (hr == S_FALSE)
-				{
-					cbProduced = 0;
-				}
-				else
-				{
-					audio_stream->buffer.GetBufferAndLength(&pProduced, &cbProduced);
-				}
-
-				if (cbProduced > 0)
-				{
-					double beamAngle, sourceAngle, sourceConfidence;
-
-					// Obtain beam angle from INuiAudioBeam afforded by microphone array
-					audio_stream->source->GetBeam(&beamAngle);
-					audio_stream->source->GetPosition(&sourceAngle, &sourceConfidence);
-
-					_last_audio_angle = sourceAngle;
-					//std::cout << _last_audio_angle << "\n";
-
-					if (output_audio_buffer) {
-						output_audio_buffer->write((const char*)pProduced, cbProduced);
-						std::cout << "writing to buffer " << cbProduced << "/" << output_audio_buffer->tellp() << "\n";
-					}
-
-				}
-				//std::cout << ".";
-
-			} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
-			//std::cout << " -- \n";
+			std::cout << "_last_audio_angle " << _last_audio_angle << "\n";
 		}
 
 		std::string update() {
@@ -384,8 +323,6 @@ namespace kfr {
 		ImgChunk* last_colour() {
 			return _last_colour;
 		}
-
-		
 
 		float last_audio_angle() {
 			return _last_audio_angle;
