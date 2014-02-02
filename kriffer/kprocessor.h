@@ -55,7 +55,6 @@ namespace kfr {
 		ImgChunk* _last_colour;
 
 		float _last_audio_angle;
-		std::iostream *output_audio_buffer;
 
 		void register_tags() {
 			//ensures tags are registered with riffer
@@ -85,8 +84,6 @@ namespace kfr {
 			depth_stream = nullptr;
 			skeleton_stream = nullptr;
 			audio_stream = nullptr;
-
-			output_audio_buffer = nullptr;
 
 			_last_depth = nullptr;
 			_last_colour = nullptr;
@@ -326,6 +323,14 @@ namespace kfr {
 
 		float last_audio_angle() {
 			return _last_audio_angle;
+		}
+
+		void start_audio_index(int audio_index) {
+			audio_stream->start_index(audio_index);
+		}
+
+		void stop_audio() {
+			audio_stream->stop_audio();
 		}
 
 		void stop() {
