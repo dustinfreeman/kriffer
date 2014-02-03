@@ -66,7 +66,7 @@ namespace kfr {
 			colourChunk->assign_image(frame_4.data, frame_4.cols*frame_4.rows*NUM_CLR_CHANNELS);
 
 			int olen;
-			char* comp_img = Processor::compress_image(colourChunk, &olen);
+			char* comp_img = Processor::compress_image(colourChunk, "colour image", &olen, "JPEG");
 
 			if(colourChunk->valid_compression) {
 				cs->add(*colourChunk);

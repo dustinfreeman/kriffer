@@ -156,7 +156,6 @@ namespace kfr {
 			add_current_time(colourChunk);
 
 			NUI_IMAGE_FRAME imageFrame;
-
 			// Attempt to get the color frame
 			hr = pNuiSensor->NuiImageStreamGetNextFrame(colour_stream->streamHandle, 0, &imageFrame);
 			if (FAILED(hr))
@@ -182,7 +181,7 @@ namespace kfr {
 				colourChunk->assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
 				
 				int olen;
-				char* comp_img = Processor::compress_image(colourChunk, &olen);
+				char* comp_img = Processor::compress_image(colourChunk, "colour image", &olen, "JPEG");
 
 				if(colourChunk->valid_compression) {
 					cs->add(*colourChunk);
@@ -194,7 +193,6 @@ namespace kfr {
 				} else {
 					std::cout << "Problem with jpge compression. \n";
 				}
-				
 			}
 
 			// Unlock frame data
@@ -229,32 +227,47 @@ namespace kfr {
 			// Make sure we've received valid data
 			if (lockedRect.Pitch != 0)
 			{
-				// Convert depth data to color image and copy to image buffer
-				//m_imageBuffer.CopyDepth(lockedRect.pBits, lockedRect.size, nearMode, m_depthTreatment);
+				add_resolution(depthChunk, imageFrame.eResolution);
 
+				depthChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
 				depthChunk->assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
 
-				unsigned int olen = depthChunk->image_size*PADDING_FACTOR;
-				void* obuf = malloc(olen);
-				int h = lzfx_compress(depthChunk->image, depthChunk->image_size, obuf, &olen);
-				if (h < 0) {
-					std::cout << "lzfx_compress failed.\n";
-					goto ReleaseTexture;
-				} else {
-				
-					add_resolution(depthChunk, imageFrame.eResolution);
-					//QuadPart is to get int64 from LARGE_INTEGER
-					depthChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
-					depthChunk->add_parameter("depth image", obuf, olen); 
+				int olen;
+				char* comp_img = Processor::compress_image(depthChunk, "depth image", &olen,  "LZF");
+
+				if(depthChunk->valid_compression) {
+					cs->add(*depthChunk);
 
 					//set last depth
 					if (_last_depth != nullptr)
 						delete _last_depth;
 					_last_depth = depthChunk;
-
-					cs->add(*depthChunk);
+				} else {
+					std::cout << "Problem with lzf compression. \n";
 				}
-				delete obuf;
+
+
+				//unsigned int olen = depthChunk->image_size*PADDING_FACTOR;
+				//void* obuf = malloc(olen);
+				//int h = lzfx_compress(depthChunk->image, depthChunk->image_size, obuf, &olen);
+				//if (h < 0) {
+				//	std::cout << "lzfx_compress failed.\n";
+				//	goto ReleaseTexture;
+				//} else {
+				//
+				//	add_resolution(depthChunk, imageFrame.eResolution);
+				//	//QuadPart is to get int64 from LARGE_INTEGER
+				//	depthChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
+				//	depthChunk->add_parameter("depth image", obuf, olen); 
+
+				//	//set last depth
+				//	if (_last_depth != nullptr)
+				//		delete _last_depth;
+				//	_last_depth = depthChunk;
+
+				//	cs->add(*depthChunk);
+				//}
+				//delete obuf;
 			}
 
 		ReleaseTexture:
@@ -322,7 +335,7 @@ namespace kfr {
 		}
 
 		std::string update() {
-			ProcessAudio(); //I feel like this should be called more frequently?
+			ProcessAudio(); 
 
 			std::ostringstream new_frames;
 			if (WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
@@ -331,14 +344,14 @@ namespace kfr {
 				new_frames << "c";
 			}
 
-			//HACK ONLY COLOUR FRAMES FOR NOW
-			// if we use other frame types, 
+			// TO INDEX BETWEEN MULTIPLE FRAME TYPES,
 			//	we will have to adjust indexing so it can filter a specific frame type.
-			/*if (WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
+			if (WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
 			{
 				ProcessDepth();
 				new_frames << "d";
 			}
+			/*
 			if (WAIT_OBJECT_0 == WaitForSingleObject(skeleton_stream->frameEvent, 0))
 			{
 				ProcessSkeleton();
