@@ -14,8 +14,8 @@ namespace kfr {
 
 		virtual void register_tags() = 0;
 
-		Processor(std::string _filename = "./capture.dat", bool overwrite = true) {
-			cs = new CaptureSession(_filename, overwrite);
+		Processor(std::string _folder = "./", std::string _filename = "./capture.dat", bool overwrite = true) {
+			cs = new CaptureSession(_folder, _filename, overwrite);
 		}
 
 		~Processor() {
@@ -58,11 +58,15 @@ namespace kfr {
 				//Colour format from Kinect:
 				//http://msdn.microsoft.com/en-us/library/jj131027.aspx
 				//X8R8G8B8
-				comp_img = new char[*olen];
-				memcpy(comp_img, obuf, *olen);
+
+				if (img_chunk->valid_compression) {
+					comp_img = new char[*olen];
+					memcpy(comp_img, obuf, *olen);
+					img_chunk->add_parameter(compress_to_param, comp_img, *olen); 
+				}
+
 				free(obuf);
 
-				img_chunk->add_parameter(compress_to_param, comp_img, *olen); 
 			}
 			if (comp_style == "LZF") {
 				unsigned int uolen;
@@ -74,11 +78,13 @@ namespace kfr {
 				else
 					img_chunk->valid_compression = true;
 
-				comp_img = new char[*olen];
-				memcpy(comp_img, obuf, *olen);
-				free(obuf);
+				if (img_chunk->valid_compression) {
+					comp_img = new char[*olen];
+					memcpy(comp_img, obuf, *olen);
+					img_chunk->add_parameter(compress_to_param, comp_img, *olen); 
+				}
 
-				img_chunk->add_parameter(compress_to_param, comp_img, *olen); 
+				free(obuf);
 			}
 
 			return comp_img;

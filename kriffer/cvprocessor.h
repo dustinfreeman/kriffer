@@ -26,8 +26,8 @@ namespace kfr {
 			tags::register_tag("colour image", "CLRI", CHAR_PTR_TYPE);
 		}
 
-		CVProcessor(int _c_index, std::string _filename = "./capture.dat", bool overwrite = true) 
-			: Processor(_filename, overwrite) {
+		CVProcessor(int _c_index, std::string _folder = "./", std::string _filename = "./capture.dat", bool overwrite = true) 
+			: Processor(_folder, _filename, overwrite) {
 			c_index = _c_index;
 
 			register_tags();

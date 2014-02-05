@@ -23,6 +23,8 @@ struct NuiAudio {
 	CWASAPICapture *capturer;
 	bool capturing;
 
+	std::string folder;
+
 	HANDLE waveFile;
 	wchar_t waveFileName[MAX_PATH];
 
@@ -143,7 +145,8 @@ struct NuiAudio {
 	void start_index(int audio_index) {
 		HRESULT hr;
 
-		StringCchPrintfW(waveFileName, _countof(waveFileName), L"C:\\Users\\dustin\\Documents\\Code\\improv_remix\\improv_remix\\nuiaudio-%i.wav", audio_index);
+		std::wstring stemp = std::wstring(folder.begin(), folder.end());
+		StringCchPrintfW(waveFileName, _countof(waveFileName), L"%snuiaudio-%i.wav", stemp.c_str(), audio_index);
 
 		// Create the wave file that will contain audio data
             waveFile = CreateFile(waveFileName, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, 

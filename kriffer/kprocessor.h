@@ -70,8 +70,8 @@ namespace kfr {
 			tags::register_tag("colour image", "CLRI", CHAR_PTR_TYPE);
 		}
 
-		KProcessor(int _k_index, std::string _filename = "./capture.dat", bool overwrite = true) 
-			: Processor(_filename, overwrite) {
+		KProcessor(int _k_index, std::string _folder = "./", std::string _filename = "./capture.dat", bool overwrite = true) 
+			: Processor(_folder, _filename, overwrite) {
 			
 			k_index = _k_index;
 			//-ve k_index indicates not to open a Kinect. for testing.
@@ -120,6 +120,7 @@ namespace kfr {
 					colour_stream = new NuiColourStream(pNuiSensor);
 					skeleton_stream = new NuiSkeletonStream(pNuiSensor);
 					audio_stream = new NuiAudio(pNuiSensor);
+					audio_stream->folder = cs->folder;
 
 					depth_stream->init();
 					colour_stream->init();
@@ -338,11 +339,12 @@ namespace kfr {
 			ProcessAudio(); 
 
 			std::ostringstream new_frames;
-			if (WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
-			{
-				ProcessColor();
-				new_frames << "c";
-			}
+			//HACK no colour for now.
+			//if (WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
+			//{
+			//	ProcessColor();
+			//	new_frames << "c";
+			//}
 
 			// TO INDEX BETWEEN MULTIPLE FRAME TYPES,
 			//	we will have to adjust indexing so it can filter a specific frame type.
