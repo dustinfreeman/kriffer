@@ -149,7 +149,7 @@ struct NuiAudio {
 		StringCchPrintfW(waveFileName, _countof(waveFileName), L"%snuiaudio-%i.wav", stemp.c_str(), audio_index);
 
 		// Create the wave file that will contain audio data
-            waveFile = CreateFile(waveFileName, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, 
+			waveFile = CreateFile(waveFileName, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, 
                 FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, 
                 NULL);
             if (INVALID_HANDLE_VALUE != waveFile)
