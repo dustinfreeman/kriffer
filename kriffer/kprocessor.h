@@ -70,7 +70,7 @@ namespace kfr {
 			tags::register_tag("colour image", "CLRI", CHAR_PTR_TYPE);
 		}
 
-		KProcessor(int _k_index, std::string _folder = "./", std::string _filename = "./capture.dat", bool overwrite = true) 
+		KProcessor(int _k_index, std::string _folder = "./", std::string _filename = "capture.dat", bool overwrite = true) 
 			: Processor(_folder, _filename, overwrite) {
 			
 			k_index = _k_index;

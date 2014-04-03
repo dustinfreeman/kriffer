@@ -16,6 +16,7 @@
 bool byte_compare(const char* array1, const char* array2, int length) {
 	//just in case this functionality doesn't exist already.
 	for (int i = 0; i < length; i++) {
+		//std::cout << array1[i] << "," << array2[i] << "\n";
 		if (array1[i] != array2[i])
 			return false;
 	}
@@ -35,7 +36,7 @@ void test_kinect_write() {
 
 	for (int i = 0; i < num_kinects; i++) {
 		std::ostringstream capture_file_name;
-		capture_file_name << "capture" << i << ".knt";
+		capture_file_name << "capture" << i << "/";
 
 		kp.push_back(new kfr::KProcessor(i, capture_file_name.str())); //get ith Kinect
 
@@ -63,7 +64,7 @@ void test_kinect_write() {
 }
 
 void test_basic() {
-	kfr::KProcessor kp(-1, "capture_basic.dat");
+	kfr::KProcessor kp(-1, "./", "basic_capture.dat");
 
 	kfr::Chunk frame0;
 	int64_t timestamp0 = 1;
@@ -124,6 +125,8 @@ void test_kinect_read_write() {
 	if (comp_length != comp_length_2) {
 		std::cout << "Warning: compressed sizes differ\n";
 	}
+	//std::cout << "Comparing compressed images of lengths " << comp_length << " and " << comp_length_2 << "\n";
+	//std::cout << "Comparing compressed images " << (void*)comp << " and " << (void*)comp2 << "\n";
 	assert(byte_compare(comp, comp2, comp_length));
 
 	//wait, I'm an idiot. It's lossy compression; this should never succeed.
