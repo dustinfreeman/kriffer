@@ -2,6 +2,10 @@
 
 #include <riffer.h>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include "jpg\jpgd.h"
 #include "jpg\jpge.h"
 
@@ -40,6 +44,27 @@ namespace kfr {
 
 			width = (*this->get_parameter<int>("width"));
 			height = (*this->get_parameter<int>("height"));
+		}
+
+		cv::Mat get_mat_image(int smaller_width, int smaller_height) {
+			//returns image, assuming given dims are less than this image's dims
+			// with cropping.
+
+			if (smaller_width > width || smaller_height > height) {
+				std::cout << "image not as expected, returning blank. \n";
+				return cv::Mat(smaller_height, smaller_width, CV_8UC4);
+			}
+
+			cv::Mat full_img = cv::Mat(height, width,  CV_8UC4, (void*)this->image);
+
+			if (smaller_width == width && smaller_height == height)
+				return full_img;
+
+			cv::Rect croppedROI( (width - smaller_width)/2, (height - smaller_height)/2, smaller_width, smaller_height);
+
+			cv::Mat cropped_img = full_img(croppedROI);
+
+			return cropped_img;
 		}
 	};
 }
