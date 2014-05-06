@@ -29,15 +29,15 @@ namespace kfr {
 		CVProcessor(int _c_index, std::string _folder = "./", std::string _filename = "capture.dat", bool overwrite = true) 
 			: Processor(_folder, _filename, overwrite) {
 			c_index = _c_index;
-
-			register_tags();
-
-			cs->index_by("timestamp");
-
 			_last_colour = nullptr;
 
+			register_tags();
+			cs->index_by("timestamp");
+
 			if (c_index >= 0) {
+				//cap = new cv::VideoCapture(); //default
 				cap = new cv::VideoCapture(c_index);
+				//cv::waitKey(300);
 			}
 		}
 

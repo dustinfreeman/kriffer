@@ -93,9 +93,12 @@ namespace kfr {
 		virtual std::string update() = 0;
 
 		ImgChunk* get_colour(int64_t ts) {
+
 			ImgChunk* colourChunk = new ImgChunk();
 			//std::string tag_filter = tags::get_tag("colour frame");
 			cs->get_at_index(colourChunk, "timestamp", ts); //, tag_filter);
+
+			//std::cout << "getting " << ts << " returning " << *colourChunk->get_parameter<int64_t>("timestamp") << "\n";
 
 			unsigned int comp_length;
 			const unsigned char* comp_data = (unsigned char*)colourChunk->get_parameter_by_tag_as_char_ptr<char*>(tags::get_tag("colour image"), &comp_length); 

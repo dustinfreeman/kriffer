@@ -17,7 +17,10 @@ namespace kfr {
 
 		unsigned char* image;
 		unsigned int image_size;
+		int width;
+		int height;
 		bool valid_compression;
+		
 		ImgChunk(std::string _tag_name = NULL_TAG) : Chunk(_tag_name) {
 			image = nullptr;
 			valid_compression = false;
@@ -34,6 +37,9 @@ namespace kfr {
 			image_size = _size;
 			image = new unsigned char[image_size];
 			memcpy(image, _image, image_size);
+
+			width = (*this->get_parameter<int>("width"));
+			height = (*this->get_parameter<int>("height"));
 		}
 	};
 }
