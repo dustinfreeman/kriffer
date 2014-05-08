@@ -64,7 +64,7 @@ namespace kfr {
 			tags::register_tag("kinect timestamp", "TMSP", INT_64_TYPE);
 			
 			tags::register_tag("depth frame", "DPTH", CHUNK_TYPE);
-			tags::register_tag("depth image", "DPDT", CHUNK_TYPE);
+			tags::register_tag("depth image", "DPDT", CHAR_PTR_TYPE);
 			
 			tags::register_tag("colour frame", "CLUR", CHUNK_TYPE);
 			tags::register_tag("colour image", "CLRI", CHAR_PTR_TYPE);
@@ -235,40 +235,18 @@ namespace kfr {
 
 				int olen;
 				char* comp_img = Processor::compress_image(depthChunk, "depth image", &olen,  "LZF");
+				//std::cout << "olen " << olen << "\n";
 
 				if(depthChunk->valid_compression) {
 					cs->add(*depthChunk);
 
-					//set last depth
 					if (_last_depth != nullptr)
 						delete _last_depth;
 					_last_depth = depthChunk;
+
 				} else {
 					std::cout << "Problem with lzf compression. \n";
 				}
-
-
-				//unsigned int olen = depthChunk->image_size*PADDING_FACTOR;
-				//void* obuf = malloc(olen);
-				//int h = lzfx_compress(depthChunk->image, depthChunk->image_size, obuf, &olen);
-				//if (h < 0) {
-				//	std::cout << "lzfx_compress failed.\n";
-				//	goto ReleaseTexture;
-				//} else {
-				//
-				//	add_resolution(depthChunk, imageFrame.eResolution);
-				//	//QuadPart is to get int64 from LARGE_INTEGER
-				//	depthChunk->add_parameter("kinect timestamp", imageFrame.liTimeStamp.QuadPart);
-				//	depthChunk->add_parameter("depth image", obuf, olen); 
-
-				//	//set last depth
-				//	if (_last_depth != nullptr)
-				//		delete _last_depth;
-				//	_last_depth = depthChunk;
-
-				//	cs->add(*depthChunk);
-				//}
-				//delete obuf;
 			}
 
 		ReleaseTexture:
@@ -283,7 +261,7 @@ namespace kfr {
 
 		}
 		void ProcessSkeleton() {
-
+			//TODO...
 		}
 		
 		typedef void (*SignalHandlerPointer)(int);
@@ -339,7 +317,10 @@ namespace kfr {
 			ProcessAudio(); 
 
 			std::ostringstream new_frames;
-			//HACK no colour for now.
+			//HACK no colour or skeleton, so that the capture file only contains depth frames
+			//NOTE: our indexing currently depends on there ONLY being depth frames - 
+			// be wary of uncommenting.
+			
 			//if (WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
 			//{
 			//	ProcessColor();
@@ -361,13 +342,48 @@ namespace kfr {
 			}*/
 			return new_frames.str();
 		}
+		
+		ImgChunk* get_depth(int64_t ts) {
+			ImgChunk* depthChunk = new ImgChunk();
+			cs->get_at_index(depthChunk, "timestamp", ts); 
+			//In an ugly hack, we don't need to tag-filter, since we are only adding 
+			// depth frames anyway! Yay!
+
+			//std::cout << depthChunk->params.size() << std::endl;
+
+			//do the uncompression.
+			unsigned int comp_length;
+			const unsigned char* comp_data = (unsigned char*)depthChunk->get_parameter_by_tag_as_char_ptr<char*>(tags::get_tag("depth image"), &comp_length); 
+
+			if (comp_data) {
+				int w = *depthChunk->get_parameter<int>("width");
+				int h = *depthChunk->get_parameter<int>("height");
+
+				void * uncomp_data = malloc(w*h*sizeof(short)*2*PADDING_FACTOR);
+				unsigned int uolen;
+				
+				int result = lzfx_decompress(comp_data, comp_length, uncomp_data, &uolen);
+				//std::cout << "uncompressed lenght: " << uolen << std::endl;
+				
+				if (result < 0)
+					depthChunk->valid_compression = false;
+				else
+					depthChunk->valid_compression = true;
+
+				if (depthChunk->valid_compression) {
+					depthChunk->assign_image((unsigned char*)uncomp_data, w*h*sizeof(short)*2);
+				}
+
+				free(uncomp_data);
+			} else {
+				std::cout << "did not get comp_data \n";
+			}
+
+			return depthChunk;
+		}
 
 		ImgChunk* last_depth() {
 			return _last_depth;
-		}
-
-		ImgChunk* last_colour() {
-			return _last_colour;
 		}
 
 		float last_audio_angle() {
