@@ -46,17 +46,18 @@ namespace kfr {
 			height = (*this->get_parameter<int>("height"));
 		}
 
-		cv::Mat get_mat_image(int smaller_width, int smaller_height) {
-			//returns image, assuming given dims are less than this image's dims
+		cv::Mat get_mat_image(int smaller_width, int smaller_height, int cv_data_type = CV_8UC4) {
+			//returns image, assuming given dims are equal to, or less than this image's dims
 			// with cropping.
-
+			
 			if (smaller_width > width || smaller_height > height) {
 				std::cout << "image not as expected, returning blank. \n";
 				return cv::Mat(smaller_height, smaller_width, CV_8UC4);
 			}
+			
+			cv::Mat full_img = cv::Mat(height, width, cv_data_type, (void*)this->image);
 
-			cv::Mat full_img = cv::Mat(height, width,  CV_8UC4, (void*)this->image);
-
+			//same size.
 			if (smaller_width == width && smaller_height == height)
 				return full_img;
 

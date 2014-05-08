@@ -9,6 +9,9 @@ namespace kfr {
 	using namespace rfr;
 
 	class Processor {
+	protected:
+		ImgChunk* _last_colour;
+
 	public:
 		CaptureSession* cs;
 
@@ -66,14 +69,14 @@ namespace kfr {
 				}
 
 				free(obuf);
-
 			}
+
 			if (comp_style == "LZF") {
 				unsigned int uolen;
-				int h = lzfx_compress(img_chunk->image, img_chunk->image_size, obuf, &uolen);
+				int result = lzfx_compress(img_chunk->image, img_chunk->image_size, obuf, &uolen);
 				*olen = (int)uolen;
 
-				if (h < 0)
+				if (result < 0)
 					img_chunk->valid_compression = false;
 				else
 					img_chunk->valid_compression = true;
@@ -93,7 +96,6 @@ namespace kfr {
 		virtual std::string update() = 0;
 
 		ImgChunk* get_colour(int64_t ts) {
-
 			ImgChunk* colourChunk = new ImgChunk();
 			//std::string tag_filter = tags::get_tag("colour frame");
 			cs->get_at_index(colourChunk, "timestamp", ts); //, tag_filter);
@@ -120,6 +122,10 @@ namespace kfr {
 			}
 
 			return colourChunk;
+		}
+
+		ImgChunk* last_colour() {
+			return _last_colour;
 		}
 
 		virtual void stop() {

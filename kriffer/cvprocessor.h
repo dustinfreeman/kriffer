@@ -14,8 +14,6 @@ namespace kfr {
 		cv::VideoCapture* cap;
 		int c_index;
 
-		ImgChunk* _last_colour;
-
 		void register_tags() {
 			//ensures tags are registered with riffer
 			tags::register_tag("width", "WDTH", INT_TYPE);
@@ -39,10 +37,6 @@ namespace kfr {
 				cap = new cv::VideoCapture(c_index);
 				//cv::waitKey(300);
 			}
-		}
-
-		ImgChunk* last_colour() {
-			return _last_colour;
 		}
 
 		std::string update() {
