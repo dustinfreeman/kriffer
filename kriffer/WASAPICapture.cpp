@@ -426,8 +426,21 @@ HRESULT CWASAPICapture::ProcessResamplerOutput(DWORD *pBytesWritten)
         hr = _OutputBuffer->Lock(&pLocked, NULL, NULL);
         if (SUCCEEDED(hr))
         {
-            DWORD lockedLength;
+			DWORD lockedLength;
             hr = _OutputBuffer->GetCurrentLength( &lockedLength );
+
+			//16 bits at a time.
+			//int GAIN_SHIFT = 0;
+			//int i = 0;
+			//while (i < lockedLength) {
+			//	short val = (pLocked[i + 1] << 8) + (pLocked[i]);
+
+			//	val = val << GAIN_SHIFT;
+
+			//	//pLocked[i + 1] = val >> 8;
+			//	//pLocked[i] = val & 255; //lower 8 bits.
+			//}
+
             if (SUCCEEDED(hr))
             {
                 if (!WriteFile(_CaptureFile, pLocked, lockedLength, pBytesWritten, NULL))
