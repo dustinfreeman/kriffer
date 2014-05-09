@@ -44,7 +44,6 @@ struct NuiAudio {
 	HRESULT CaptureAudio(CWASAPICapture *capturer, HANDLE waveFile, const wchar_t *waveFileName)
 	{
 		HRESULT hr = S_OK;
-		wchar_t ch;
 
 		// Write a placeholder wave file header. Actual size of data section will be fixed up later.
 		hr = WriteWaveHeader(waveFile, capturer->GetOutputFormat(), 0);

@@ -311,7 +311,7 @@ namespace kfr {
 					audio_stream->source->GetBeam(&beamAngle);
 					audio_stream->source->GetPosition(&sourceAngle, &sourceConfidence);
 
-					_last_audio_angle = sourceAngle;
+					_last_audio_angle = (float)sourceAngle;
 					//std::cout << _last_audio_angle << "\n";
 
 					//output_audio_buffer->write((const char*)pProduced, cbProduced);
