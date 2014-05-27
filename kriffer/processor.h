@@ -25,6 +25,9 @@ namespace kfr {
 			delete cs;
 		}
 
+		//returns if capture input source is open, not the capture file.
+		virtual bool isOpened() = 0;
+
 		static int64_t get_current_time() {
 			FILETIME time; GetSystemTimeAsFileTime(&time);
 			//Contains a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601 (UTC).

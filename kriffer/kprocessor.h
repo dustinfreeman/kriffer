@@ -35,12 +35,18 @@ void SignalHandler(int signal)
 }
 
 namespace kfr {
-
 	using namespace rfr;
 
+	const int CAPTURE_DEPTH = 1;
+	const int CAPTURE_COLOUR = 2;
+	const int CAPTURE_SKELETON = 4;
+	const int CAPTURE_AUDIO = 8;
+	const int CAPTURE_ALL = CAPTURE_DEPTH + CAPTURE_COLOUR + CAPTURE_SKELETON + CAPTURE_AUDIO;
+
 	class KProcessor: public Processor {
-	public:
-		int k_index;
+	private:
+		bool kinect_opened;
+		int capture_select;
 
 		INuiSensor * pNuiSensor;
 
@@ -56,6 +62,9 @@ namespace kfr {
 
 		float _last_audio_angle;
 
+	public:
+		int k_index;
+
 		void register_tags() {
 			//ensures tags are registered with riffer
 			tags::register_tag("width", "WDTH", INT_TYPE);
@@ -70,8 +79,12 @@ namespace kfr {
 			tags::register_tag("colour image", "CLRI", CHAR_PTR_TYPE);
 		}
 
-		KProcessor(int _k_index, std::string _folder = "./", std::string _filename = "capture.dat", bool overwrite = true) 
-			: Processor(_folder, _filename, overwrite) {
+		KProcessor(int _k_index, 
+			std::string _folder = "./", std::string _filename = "capture.dat", 
+			int _capture_select= CAPTURE_ALL,
+			bool overwrite = true) 
+			: Processor(_folder, _filename, overwrite),
+			capture_select(_capture_select) {
 			
 			k_index = _k_index;
 			//-ve k_index indicates not to open a Kinect. for testing.
@@ -91,7 +104,9 @@ namespace kfr {
 
 			cs->index_by("timestamp");
 
+			kinect_opened = false;
 			if (k_index >= 0) {
+
 				//The following from DepthBasics-D2D CDepthBasics::CreateFirstConnected()
 				//open kinect
 				hr = NuiCreateSensorByIndex(k_index, &pNuiSensor);
@@ -116,20 +131,36 @@ namespace kfr {
 
 				if (SUCCEEDED(hr))
 				{
-					depth_stream = new NuiDepthStream(pNuiSensor);
-					colour_stream = new NuiColourStream(pNuiSensor);
-					skeleton_stream = new NuiSkeletonStream(pNuiSensor);
-					audio_stream = new NuiAudio(pNuiSensor);
-					audio_stream->folder = cs->folder;
+					if (capture_select | CAPTURE_DEPTH) {
+						depth_stream = new NuiDepthStream(pNuiSensor);
+						depth_stream->init();
+					}
+					if (capture_select | CAPTURE_COLOUR) {
+						colour_stream = new NuiColourStream(pNuiSensor);
+						colour_stream->init();
+					}
+	
+					if (capture_select | CAPTURE_SKELETON) {
+						skeleton_stream = new NuiSkeletonStream(pNuiSensor);
+						skeleton_stream->init();
+					}	
+					
+					if (capture_select | CAPTURE_AUDIO) {
+						audio_stream = new NuiAudio(pNuiSensor);
+						audio_stream->folder = cs->folder;
+						audio_stream->init();
+					}
 
-					depth_stream->init();
-					colour_stream->init();
-					skeleton_stream->init();
-					audio_stream->init();
+					kinect_opened = true;
 				}
 			}
 		}
 		
+		bool isOpened() {
+			//currently, only returns state of Kinect on first open.
+			return kinect_opened;
+		}
+
 		void add_resolution(Chunk* chunk, int resolution) {
 			switch(resolution) {
 				case NUI_IMAGE_RESOLUTION_80x60:
@@ -320,6 +351,10 @@ namespace kfr {
 			} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
 		}
 
+		std::string get_wav_filename() {
+			return audio_stream->get_wav_filename();
+		}
+
 		std::string update() {
 			ProcessAudio(); 
 
@@ -328,15 +363,15 @@ namespace kfr {
 			//NOTE: our indexing currently depends on there ONLY being depth frames - 
 			// be wary of uncommenting.
 			
-			//if (WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
-			//{
-			//	ProcessColor();
-			//	new_frames << "c";
-			//}
+			if (capture_select | CAPTURE_COLOUR && WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
+			{
+				ProcessColor();
+				new_frames << "c";
+			}
 
 			// TO INDEX BETWEEN MULTIPLE FRAME TYPES,
 			//	we will have to adjust indexing so it can filter a specific frame type.
-			if (WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
+			if (capture_select | CAPTURE_DEPTH && WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
 			{
 				ProcessDepth();
 				new_frames << "d";

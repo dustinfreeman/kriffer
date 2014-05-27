@@ -51,7 +51,7 @@ namespace kfr {
 			// with cropping.
 			
 			if (smaller_width > width || smaller_height > height) {
-				std::cout << "image not as expected, returning blank. \n";
+				std::cout << "image not as expected, returning blank. " << width << "," << height << " \n";
 				return cv::Mat(smaller_height, smaller_width, CV_8UC4);
 			}
 			

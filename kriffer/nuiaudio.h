@@ -28,7 +28,7 @@ struct NuiAudio {
 	HANDLE waveFile;
 	wchar_t waveFileName[MAX_PATH];
 
-	std::string get_wave_filename() {
+	std::string get_wav_filename() {
 		std::wstring ws(waveFileName);
 		return std::string(ws.begin(), ws.end());
 	}

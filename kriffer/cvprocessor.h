@@ -76,6 +76,10 @@ namespace kfr {
 			return "c";
 		}
 
+		bool isOpened() {
+			return cap->isOpened();
+		}
+
 		void stop() {
 			Processor::stop();
 		}
