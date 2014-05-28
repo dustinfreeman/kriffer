@@ -131,21 +131,21 @@ namespace kfr {
 
 				if (SUCCEEDED(hr))
 				{
-					if (capture_select | CAPTURE_DEPTH) {
+					if (capture_select & CAPTURE_DEPTH) {
 						depth_stream = new NuiDepthStream(pNuiSensor);
 						depth_stream->init();
 					}
-					if (capture_select | CAPTURE_COLOUR) {
+					if (capture_select & CAPTURE_COLOUR) {
 						colour_stream = new NuiColourStream(pNuiSensor);
 						colour_stream->init();
 					}
 	
-					if (capture_select | CAPTURE_SKELETON) {
+					if (capture_select & CAPTURE_SKELETON) {
 						skeleton_stream = new NuiSkeletonStream(pNuiSensor);
 						skeleton_stream->init();
 					}	
 					
-					if (capture_select | CAPTURE_AUDIO) {
+					if (capture_select & CAPTURE_AUDIO) {
 						audio_stream = new NuiAudio(pNuiSensor);
 						audio_stream->folder = cs->get_folder();
 						audio_stream->init();
@@ -357,22 +357,19 @@ namespace kfr {
 
 		std::string update() {
 			std::ostringstream new_frames;
-			//HACK no colour or skeleton, so that the capture file only contains depth frames
-			//NOTE: our indexing currently depends on there ONLY being depth frames - 
-			// be wary of uncommenting.
 
-			if (capture_select | CAPTURE_AUDIO)
-				ProcessAudio(); 
+			/*if (capture_select & CAPTURE_AUDIO)
+				ProcessAudio(); */
 			
-			if (capture_select | CAPTURE_COLOUR && WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
+			/*if (capture_select & CAPTURE_COLOUR && WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
 			{
 				ProcessColor();
 				new_frames << "c";
-			}
+			}*/
 
 			// TO INDEX BETWEEN MULTIPLE FRAME TYPES,
 			//	we will have to adjust indexing so it can filter a specific frame type.
-			if (capture_select | CAPTURE_DEPTH && WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
+			if (capture_select & CAPTURE_DEPTH && WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0) )
 			{
 				ProcessDepth();
 				new_frames << "d";
