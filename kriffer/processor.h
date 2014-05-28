@@ -101,7 +101,7 @@ namespace kfr {
 		ImgChunk* get_colour(int64_t ts) {
 			ImgChunk* colourChunk = new ImgChunk();
 			//std::string tag_filter = tags::get_tag("colour frame");
-			cs->get_at_index(colourChunk, "timestamp", ts); //, tag_filter);
+			cs->get_by_index(colourChunk, ts); //, tag_filter);
 
 			//std::cout << "getting " << ts << " returning " << *colourChunk->get_parameter<int64_t>("timestamp") << "\n";
 

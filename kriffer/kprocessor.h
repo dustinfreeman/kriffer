@@ -147,7 +147,7 @@ namespace kfr {
 					
 					if (capture_select | CAPTURE_AUDIO) {
 						audio_stream = new NuiAudio(pNuiSensor);
-						audio_stream->folder = cs->folder;
+						audio_stream->folder = cs->get_folder();
 						audio_stream->init();
 					}
 
@@ -387,7 +387,7 @@ namespace kfr {
 		
 		ImgChunk* get_depth(int64_t ts) {
 			ImgChunk* depthChunk = new ImgChunk();
-			cs->get_at_index(depthChunk, "timestamp", ts); 
+			cs->get_by_index(depthChunk, ts); 
 			//In an ugly hack, we don't need to tag-filter, since we are only adding 
 			// depth frames anyway! Yay!
 
