@@ -358,8 +358,8 @@ namespace kfr {
 		std::string update() {
 			std::ostringstream new_frames;
 
-			/*if (capture_select & CAPTURE_AUDIO)
-				ProcessAudio(); */
+			if (capture_select & CAPTURE_AUDIO)
+				ProcessAudio();
 			
 			/*if (capture_select & CAPTURE_COLOUR && WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
 			{

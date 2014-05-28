@@ -39,7 +39,7 @@ void test_kinect_write() {
 
 	for (int i = 0; i < num_kinects; i++) {
 		std::ostringstream capture_file_name;
-		capture_file_name << "capture" << i << "-";
+		capture_file_name << "capture" << i << ".dat";
 
 		kp.push_back(new kfr::KProcessor(i, "./", capture_file_name.str())); //get ith Kinect
 
@@ -47,7 +47,7 @@ void test_kinect_write() {
 	}
 	//now, the KinectProcessor should be writing frames to the capture session!
 	
-	int test_duration = 10; //seconds.
+	int test_duration = 2; //seconds.
 	time_t start;	time_t end;
 	time(&start);	time(&end);
 	std::cout << "test_kinect_write: Running update() for " << test_duration << " seconds.\n";
@@ -203,7 +203,7 @@ void test_frame_fetch() {
 	}
 	//now, the KinectProcessor should be writing frames to the capture session!
 	
-	int test_duration = 10; //seconds.
+	int test_duration = 2; //seconds.
 	time_t start;	time_t end;
 	time(&start);	time(&end);
 	std::cout << "test_frame_fetch: Running update() for " << test_duration << " seconds.\n";
@@ -224,7 +224,7 @@ void test_frame_fetch() {
 
 int main() {
 	test_kinect_write();
-	return 0;
+	
 	test_basic();
 
 	test_kinect_read_write();
@@ -234,5 +234,6 @@ int main() {
 	test_frame_fetch();
 
 	std::cout << "Finished all tests.\n";
-	while(true) { }
+	
+	//while(true) { }
 }
