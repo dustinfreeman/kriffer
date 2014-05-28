@@ -121,6 +121,10 @@ struct NuiAudio {
 		memcpy_s(mt.pbFormat, sizeof(WAVEFORMATEX), &wfxOut, sizeof(WAVEFORMATEX));
 
 		hr = m_pDMO->SetOutputType(0, &mt, 0);
+		if (FAILED(hr))
+		{
+			std::cout << "Audio FAILED(hr) \n";
+		}
 		MoFreeMediaType(&mt);
 	}
 
@@ -130,10 +134,12 @@ struct NuiAudio {
 		init_source_beam();
 
 		//  Find the audio device corresponding to the kinect sensor.
+		CoInitialize(nullptr); // NULL if using older VC++
+		//above line added to fix bad hr result from below call. http://stackoverflow.com/a/17076454
         hr = GetMatchingAudioDevice(pNuiSensor, &device);
         if (SUCCEEDED(hr))
         {
-			//audio recording is initialized separately.
+			//formerly, audio recording was initialized here - now separate.
         }
         else
         {
