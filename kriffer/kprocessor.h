@@ -356,12 +356,13 @@ namespace kfr {
 		}
 
 		std::string update() {
-			ProcessAudio(); 
-
 			std::ostringstream new_frames;
 			//HACK no colour or skeleton, so that the capture file only contains depth frames
 			//NOTE: our indexing currently depends on there ONLY being depth frames - 
 			// be wary of uncommenting.
+
+			if (capture_select | CAPTURE_AUDIO)
+				ProcessAudio(); 
 			
 			if (capture_select | CAPTURE_COLOUR && WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
 			{
@@ -387,7 +388,7 @@ namespace kfr {
 		
 		ImgChunk* get_depth(int64_t ts) {
 			ImgChunk* depthChunk = new ImgChunk();
-			cs->get_by_index(depthChunk, ts); 
+			cs->get_by_index(depthChunk, ts, "depth frame"); 
 			//In an ugly hack, we don't need to tag-filter, since we are only adding 
 			// depth frames anyway! Yay!
 

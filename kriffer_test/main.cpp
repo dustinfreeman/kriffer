@@ -39,9 +39,9 @@ void test_kinect_write() {
 
 	for (int i = 0; i < num_kinects; i++) {
 		std::ostringstream capture_file_name;
-		capture_file_name << "capture" << i << "/";
+		capture_file_name << "capture" << i << "-";
 
-		kp.push_back(new kfr::KProcessor(i, capture_file_name.str())); //get ith Kinect
+		kp.push_back(new kfr::KProcessor(i, "./", capture_file_name.str())); //get ith Kinect
 
 		break; //for now, break after 1.
 	}
@@ -50,7 +50,7 @@ void test_kinect_write() {
 	int test_duration = 10; //seconds.
 	time_t start;	time_t end;
 	time(&start);	time(&end);
-	std::cout << "Running update() for " << test_duration << " seconds.\n";
+	std::cout << "test_kinect_write: Running update() for " << test_duration << " seconds.\n";
 	while (difftime(end,start) < test_duration) {
 		time(&end);
 		for (int i = 0; i < kp.size(); i++) {
@@ -182,14 +182,56 @@ void test_depth_read_write() {
 	kp.stop();
 }
 
-int main() {
-	//test_kinect_write();
+void test_frame_fetch() {
+	int num_kinects = kfr::get_num_kinects();
+	if (num_kinects < 1) {
+		std::cout << "No Kinects found, cannot run test.\n";
+		return;
+	} else {
+		std::cout << "Found " << num_kinects << " Kinects.\n";
+	}
 
+	std::vector<kfr::KProcessor*> kp;
+
+	for (int i = 0; i < num_kinects; i++) {
+		std::ostringstream capture_file_name;
+		capture_file_name << "capture" << i << "-";
+
+		kp.push_back(new kfr::KProcessor(i, "./", capture_file_name.str())); //get ith Kinect
+
+		break; //for now, break after 1.
+	}
+	//now, the KinectProcessor should be writing frames to the capture session!
+	
+	int test_duration = 10; //seconds.
+	time_t start;	time_t end;
+	time(&start);	time(&end);
+	std::cout << "test_frame_fetch: Running update() for " << test_duration << " seconds.\n";
+	while (difftime(end,start) < test_duration) {
+		time(&end);
+		for (int i = 0; i < kp.size(); i++) {
+			std::string new_frames = kp[i]->update();
+			std::cout << new_frames;
+		}
+		std::cout << ",";
+	}
+	std::cout << "\n";
+
+	for (int i = 0; i < kp.size(); i++) {
+		kp[i]->stop();
+	}
+}
+
+int main() {
+	test_kinect_write();
+	return 0;
 	test_basic();
 
 	test_kinect_read_write();
 
 	test_depth_read_write();
+
+	test_frame_fetch();
 
 	std::cout << "Finished all tests.\n";
 	while(true) { }
