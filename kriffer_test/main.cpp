@@ -26,16 +26,16 @@ bool byte_compare(const char* array1, const char* array2, int length) {
 	return true;
 }
 
-void test_kinect_write() {
+std::vector<kfr::KProcessor*> open_kinects() {
+	std::vector<kfr::KProcessor*> kp;
+	
 	int num_kinects = kfr::get_num_kinects();
 	if (num_kinects < 1) {
 		std::cout << "No Kinects found.\n";
-		return;
+		return kp;
 	} else {
 		std::cout << "Found " << num_kinects << " Kinects.\n";
 	}
-
-	std::vector<kfr::KProcessor*> kp;
 
 	for (int i = 0; i < num_kinects; i++) {
 		std::ostringstream capture_file_name;
@@ -46,7 +46,15 @@ void test_kinect_write() {
 		break; //for now, break after 1.
 	}
 	//now, the KinectProcessor should be writing frames to the capture session!
-	
+
+	return kp;
+}
+
+void test_kinect_write() {
+	std::vector<kfr::KProcessor*> kp = open_kinects();
+	if (kp.size() == 0)
+		return;
+
 	int test_duration = 2; //seconds.
 	time_t start;	time_t end;
 	time(&start);	time(&end);
@@ -183,26 +191,10 @@ void test_depth_read_write() {
 }
 
 void test_frame_fetch() {
-	int num_kinects = kfr::get_num_kinects();
-	if (num_kinects < 1) {
-		std::cout << "No Kinects found, cannot run test.\n";
+	std::vector<kfr::KProcessor*> kp = open_kinects();
+	if (kp.size() == 0)
 		return;
-	} else {
-		std::cout << "Found " << num_kinects << " Kinects.\n";
-	}
 
-	std::vector<kfr::KProcessor*> kp;
-
-	for (int i = 0; i < num_kinects; i++) {
-		std::ostringstream capture_file_name;
-		capture_file_name << "capture" << i << "-";
-
-		kp.push_back(new kfr::KProcessor(i, "./", capture_file_name.str())); //get ith Kinect
-
-		break; //for now, break after 1.
-	}
-	//now, the KinectProcessor should be writing frames to the capture session!
-	
 	int test_duration = 2; //seconds.
 	time_t start;	time_t end;
 	time(&start);	time(&end);
@@ -220,6 +212,16 @@ void test_frame_fetch() {
 	for (int i = 0; i < kp.size(); i++) {
 		kp[i]->stop();
 	}
+
+	//TODO fetch different colour and depth frames.
+
+
+
+
+
+
+
+
 }
 
 int main() {
