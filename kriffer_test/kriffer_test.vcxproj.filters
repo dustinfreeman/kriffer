@@ -22,6 +22,9 @@
     <Filter Include="Source Files\kriffer\jpg">
       <UniqueIdentifier>{4a5defee-8fb8-4637-b0df-4932a6fd48ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\kriffer\audio">
+      <UniqueIdentifier>{2992023b-3050-47e7-b8ee-71b66a3f8a5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -38,6 +41,12 @@
     </ClCompile>
     <ClCompile Include="..\kriffer\jpg\jpgd.cpp">
       <Filter>Source Files\kriffer\jpg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\WASAPICapture.cpp">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\ResamplerUtil.cpp">
+      <Filter>Source Files\kriffer\audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +100,21 @@
     </ClInclude>
     <ClInclude Include="..\kriffer\kr_util.h">
       <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\audio_buffer.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\audio_utils.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\ResamplerUtil.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\WASAPICapture.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuiaudio.h">
+      <Filter>Source Files\kriffer\audio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

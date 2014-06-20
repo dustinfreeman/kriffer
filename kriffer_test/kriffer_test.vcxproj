@@ -84,9 +84,13 @@
     <ClCompile Include="..\kriffer\jpg\jpge.cpp" />
     <ClCompile Include="..\kriffer\lzfx\getopt.c" />
     <ClCompile Include="..\kriffer\lzfx\lzfx.c" />
+    <ClCompile Include="..\kriffer\ResamplerUtil.cpp" />
+    <ClCompile Include="..\kriffer\WASAPICapture.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\kriffer\audio_buffer.h" />
+    <ClInclude Include="..\kriffer\audio_utils.h" />
     <ClInclude Include="..\kriffer\cvprocessor.h" />
     <ClInclude Include="..\kriffer\img_chunk.h" />
     <ClInclude Include="..\kriffer\jpg\jpgd.h" />
@@ -99,11 +103,14 @@
     <ClInclude Include="..\kriffer\lzfx\getopt.h" />
     <ClInclude Include="..\kriffer\lzfx\lzfx.h" />
     <ClInclude Include="..\kriffer\lzfx\unistd.h" />
+    <ClInclude Include="..\kriffer\nuiaudio.h" />
     <ClInclude Include="..\kriffer\nuicolourstream.h" />
     <ClInclude Include="..\kriffer\nuidepthstream.h" />
     <ClInclude Include="..\kriffer\nuiskeletonstream.h" />
     <ClInclude Include="..\kriffer\nuistream.h" />
+    <ClInclude Include="..\kriffer\ResamplerUtil.h" />
     <ClInclude Include="..\kriffer\utility.h" />
+    <ClInclude Include="..\kriffer\WASAPICapture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

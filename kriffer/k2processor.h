@@ -33,7 +33,7 @@ namespace kfr {
 			int _capture_select= CAPTURE_ALL,
 			bool overwrite = true);
 
-		std::string get_wav_filename();
+		std::string get_wav_filename() { return "no valid file - k2processor.";  }
 		void start_audio_index(int audio_index) {
 
 		}
