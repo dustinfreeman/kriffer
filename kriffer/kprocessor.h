@@ -29,6 +29,14 @@
 //I'm annoyed I couldn't find the above in NuiApi.h
 
 namespace kfr {
+	using namespace rfr;
+
+	const int CAPTURE_DEPTH = 1;
+	const int CAPTURE_COLOUR = 2;
+	const int CAPTURE_SKELETON = 4;
+	const int CAPTURE_AUDIO = 8;
+	const int CAPTURE_ALL = CAPTURE_DEPTH + CAPTURE_COLOUR + CAPTURE_SKELETON + CAPTURE_AUDIO;
+
 	int get_num_kinect_1s() {
 		int iSensorCount = 0;
 		HRESULT hr = NuiGetSensorCount(&iSensorCount);
@@ -40,26 +48,16 @@ namespace kfr {
 	int get_num_kinects() {
 		return get_num_kinect_1s() + get_num_kinect_2s();
 	}
-};
 
-void SignalHandler(int signal)
-{
-	printf("Signal %d",signal);
-	throw "!Access Violation!";
-}
-
-namespace kfr {
-	using namespace rfr;
-
-	const int CAPTURE_DEPTH = 1;
-	const int CAPTURE_COLOUR = 2;
-	const int CAPTURE_SKELETON = 4;
-	const int CAPTURE_AUDIO = 8;
-	const int CAPTURE_ALL = CAPTURE_DEPTH + CAPTURE_COLOUR + CAPTURE_SKELETON + CAPTURE_AUDIO;
+	//below function used to catch audio errors.
+	void SignalHandler(int signal)
+	{
+		printf("Signal %d",signal);
+		throw "!Access Violation!";
+	}
+	//typedef void (*SignalHandlerPointer)(int);
 
 	class KProcessor: public Processor {
-		friend class Kriffer;
-
 	protected:
 		bool kinect_opened;
 		int capture_select;
@@ -172,30 +170,6 @@ namespace kfr {
 			}
 		}
 
-	public:
-		//factory method =============
-		static KProcessor* get_kinect(int index, std::string folder = RFR_DEFAULT_FOLDER, std::string filename = RFR_DEFAULT_FILENAME, int _capture_select = CAPTURE_ALL, bool overwrite = true) {
-			//indexes Kinect 2s first, then Kinect 1s
-
-			//default, empty processor
-			if (index < 0) {
-				return new KProcessor(-1);
-			}
-
-			if (index < get_num_kinect_2s()) {
-				//TODO return Kinect2 Processor
-			} else if (index < get_num_kinects()) {
-				return new kfr::KProcessor(index, folder, filename, _capture_select, overwrite);
-			}
-
-			return nullptr;
-		}
-		
-		bool isOpened() {
-			//currently, only returns state of Kinect on first open.
-			return kinect_opened;
-		}
-
 		void add_resolution(Chunk* chunk, int resolution) {
 			switch(resolution) {
 				case NUI_IMAGE_RESOLUTION_80x60:
@@ -217,7 +191,7 @@ namespace kfr {
 			}
 		}
 
-		//Method from KinectExplorer-D2D
+		//Methods from KinectExplorer-D2D
 		void ProcessColor() {
 			ImgChunk* colourChunk = new ImgChunk("colour frame");
 			add_current_time(colourChunk);
@@ -337,8 +311,6 @@ namespace kfr {
 		void ProcessSkeleton() {
 			//TODO...
 		}
-		
-		typedef void (*SignalHandlerPointer)(int);
 
 		void ProcessAudio() {
 			ULONG cbProduced = 0;
@@ -387,6 +359,30 @@ namespace kfr {
 			} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
 		}
 
+	public:
+		//factory method =============
+		static KProcessor* get_kinect(int index, std::string folder = RFR_DEFAULT_FOLDER, std::string filename = RFR_DEFAULT_FILENAME, int _capture_select = CAPTURE_ALL, bool overwrite = true) {
+			//indexes Kinect 2s first, then Kinect 1s
+
+			//default, empty processor
+			if (index < 0) {
+				return new KProcessor(-1);
+			}
+
+			if (index < get_num_kinect_2s()) {
+				//TODO return Kinect2 Processor
+			} else if (index < get_num_kinects()) {
+				return new kfr::KProcessor(index, folder, filename, _capture_select, overwrite);
+			}
+
+			return nullptr;
+		}
+		
+		bool isOpened() {
+			//currently, only returns state of Kinect on first open.
+			return kinect_opened;
+		}
+		
 		std::string get_wav_filename() {
 			return audio_stream->get_wav_filename();
 		}
@@ -491,5 +487,7 @@ namespace kfr {
 
 			Processor::stop();
 		}
+
+		friend class KrifferTest;
 	};
 };
