@@ -29,7 +29,7 @@ namespace kfr {
 		}
 
 		if (index < get_num_kinect_2s()) {
-			//TODO return Kinect2 Processor
+			return new kfr::K2Processor(index, folder, filename, _capture_select, overwrite);
 		} else if (index < get_num_kinects()) {
 			int k1_index = index - get_num_kinect_2s();
 			return new kfr::K1Processor(k1_index, folder, filename, _capture_select, overwrite);

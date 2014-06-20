@@ -83,11 +83,11 @@ namespace kfr {
 
 		void register_tags();
 
-		virtual void ProcessColor() { std::cout << "empty kprocessor process called. \n"; }
+		virtual bool ProcessColor() { std::cout << "empty kprocessor process called. \n"; return false; }
 
-		virtual void ProcessDepth() { std::cout << "empty kprocessor process called. \n"; }
+		virtual bool ProcessDepth() { std::cout << "empty kprocessor process called. \n"; return false; }
 
-		virtual void ProcessAudio() { std::cout << "empty kprocessor process called. \n"; }
+		virtual bool ProcessAudio() { std::cout << "empty kprocessor process called. \n"; return false; }
 	};
 
 	KProcessor::KProcessor(int _k_index, 
@@ -138,16 +138,16 @@ namespace kfr {
 			
 		if (capture_select & CAPTURE_COLOUR)
 		{
-			ProcessColor();
-			new_frames << "c";
+			if (ProcessColor())
+				new_frames << "c";
 		}
 
 		// TO INDEX BETWEEN MULTIPLE FRAME TYPES,
 		//	we will have to adjust indexing so it can filter a specific frame type.
 		if (capture_select & CAPTURE_DEPTH)
 		{
-			ProcessDepth();
-			new_frames << "d";
+			if (ProcessDepth())
+				new_frames << "d";
 		}
 		/*
 		if (WAIT_OBJECT_0 == WaitForSingleObject(skeleton_stream->frameEvent, 0))
@@ -155,6 +155,9 @@ namespace kfr {
 			//TODO ProcessSkeleton();
 			new_frames << "s";
 		}*/
+
+		if (new_frames.str().size() == 0)
+			return ""; //should not have to do this. :(
 		return new_frames.str();
 	}
 	

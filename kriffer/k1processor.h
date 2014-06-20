@@ -54,12 +54,12 @@ namespace kfr {
 		void add_resolution(Chunk* chunk, int resolution);
 
 		//Methods from KinectExplorer-D2D
-		void ProcessColor();
+		bool ProcessColor();
 
 		void add_depth_chunk(ImgChunk* depthChunk);
-		void ProcessDepth();
+		bool ProcessDepth();
 
-		void ProcessAudio();
+		bool ProcessAudio();
 	};
 
 	K1Processor::K1Processor(int _k_index, 
@@ -149,9 +149,11 @@ namespace kfr {
 		}
 	}
 
-	void K1Processor::ProcessColor() {
+	bool K1Processor::ProcessColor() {
+		bool got_frame = false;
+
 		if (! WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
-			return; 
+			return got_frame;
 
 		ImgChunk* colourChunk = new ImgChunk("colour frame");
 		add_current_time(colourChunk);
@@ -162,7 +164,7 @@ namespace kfr {
 		if (FAILED(hr))
 		{
 			std::cout << "Colour's NuiImageStreamGetNextFrame Failed.\n";
-			return;
+			return got_frame;
 		}
 
 		INuiFrameTexture* pTexture = imageFrame.pFrameTexture;
@@ -194,11 +196,14 @@ namespace kfr {
 			} else {
 				std::cout << "Problem with jpge compression. \n";
 			}
+			got_frame = true;
 		}
 
 		// Unlock frame data
 		pTexture->UnlockRect(0);
 		pNuiSensor->NuiImageStreamReleaseFrame(colour_stream->streamHandle, &imageFrame);
+
+		return got_frame;
 	}
 		
 	void K1Processor::add_depth_chunk(ImgChunk* depthChunk) {
@@ -219,9 +224,11 @@ namespace kfr {
 		}
 	}
 
-	void K1Processor::ProcessDepth() {
+	bool K1Processor::ProcessDepth() {
+		bool got_frame = false;
+
 		if (! WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0))
-			return; 
+			return got_frame; 
 
 		ImgChunk* depthChunk = new ImgChunk("depth frame");
 		add_current_time(depthChunk);
@@ -231,7 +238,7 @@ namespace kfr {
 		if (FAILED(hr))
 		{
 			std::cout << "Depth's NuiImageStreamGetNextFrame Failed.\n";
-			return;
+			return got_frame;
 		}
 
 		// Get the depth image pixel texture
@@ -256,7 +263,7 @@ namespace kfr {
 			depthChunk->assign_image(lockedRect.pBits, lockedRect.size*sizeof(BYTE));
 
 			add_depth_chunk(depthChunk);
-				
+			got_frame = true;	
 		}
 
 	ReleaseTexture:
@@ -269,9 +276,10 @@ namespace kfr {
 		// Release the frame
 		pNuiSensor->NuiImageStreamReleaseFrame(depth_stream->streamHandle, &imageFrame);
 
+		return got_frame;
 	}
 
-	void K1Processor::ProcessAudio() {
+	bool K1Processor::ProcessAudio() {
 		ULONG cbProduced = 0;
 		BYTE *pProduced = NULL;
 		DWORD dwStatus = 0;
@@ -316,6 +324,8 @@ namespace kfr {
 			}
 
 		} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
+
+		return true;
 	}
 
 	std::string K1Processor::get_wav_filename() {

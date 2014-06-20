@@ -95,6 +95,7 @@
     <ClInclude Include="..\kriffer\k2processor.h" />
     <ClInclude Include="..\kriffer\kprocessor.h" />
     <ClInclude Include="..\kriffer\kriffer.h" />
+    <ClInclude Include="..\kriffer\kr_util.h" />
     <ClInclude Include="..\kriffer\lzfx\getopt.h" />
     <ClInclude Include="..\kriffer\lzfx\lzfx.h" />
     <ClInclude Include="..\kriffer\lzfx\unistd.h" />
