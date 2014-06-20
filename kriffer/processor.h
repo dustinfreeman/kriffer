@@ -17,7 +17,7 @@ namespace kfr {
 
 		virtual void register_tags() = 0;
 
-		Processor(std::string _folder = "./", std::string _filename = "./capture.dat", bool overwrite = true) {
+		Processor(std::string _folder = RFR_DEFAULT_FOLDER, std::string _filename = RFR_DEFAULT_FILENAME, bool overwrite = true) {
 			cs = new CaptureSession(_folder, _filename, overwrite);
 		}
 

@@ -41,7 +41,7 @@ std::vector<kfr::KProcessor*> open_kinects() {
 		std::ostringstream capture_file_name;
 		capture_file_name << "capture" << i << ".dat";
 
-		kp.push_back(new kfr::KProcessor(i, "./", capture_file_name.str())); //get ith Kinect
+		kp.push_back(kfr::KProcessor::get_kinect(i, RFR_DEFAULT_FOLDER, capture_file_name.str())); //get ith Kinect
 
 		break; //for now, break after 1.
 	}
@@ -75,24 +75,24 @@ void test_kinect_write() {
 }
 
 void test_basic() {
-	kfr::KProcessor kp(-1, "./", "basic_capture.dat");
+	kfr::KProcessor* kp = kfr::KProcessor::get_kinect(-1, RFR_DEFAULT_FOLDER, "basic_capture.dat");
 
 	kfr::Chunk frame0;
 	int64_t timestamp0 = 1;
 	frame0.add_parameter("timestamp", timestamp0);
-	kp.cs->add(frame0);
+	kp->cs->add(frame0);
 
 	kfr::Chunk frame1;
 	int64_t timestamp1 = 2;
 	frame1.add_parameter("timestamp", timestamp1);
-	kp.cs->add(frame1);
+	kp->cs->add(frame1);
 }
 
 void test_kinect_read_write() {
 	//open KProcessor without kinect.
 	//create colour images and artifically add jpeg to k capture session
 	//retrieve images and test for similarity.
-	kfr::KProcessor kp(-1);
+	kfr::KProcessor* kp = kfr::KProcessor::get_kinect(-1);
 
 	//create image
 	kfr::ImgChunk* chunk = new kfr::ImgChunk("colour frame"); 
@@ -117,10 +117,10 @@ void test_kinect_read_write() {
 	chunk->assign_image((BYTE*)image_bytes, img_length);
 
 	//add image to capture session
-	kp.cs->add(*chunk);
+	kp->cs->add(*chunk);
 
 	//fetch and compare
-	kfr::ImgChunk* fetched_chunk = kp.get_colour(timestamp);
+	kfr::ImgChunk* fetched_chunk = kp->get_colour(timestamp);
 
 	int64_t fetch_ts = *fetched_chunk->get_parameter<int64_t>("timestamp");
 	if (timestamp != fetch_ts)
@@ -140,13 +140,13 @@ void test_kinect_read_write() {
 	//wait, I'm an idiot. It's lossy compression; this should never succeed.
 	//assert(byte_compare((char*)chunk->image, (char*)fetched_chunk->image, chunk->image_size));
 
-	kp.stop();
+	kp->stop();
 }
 
 void test_depth_read_write() {
 	//test if depth reads the same as it is written
 
-	kfr::KProcessor kp(-1);
+	kfr::KProcessor* kp = kfr::KProcessor::get_kinect(-1);
 
 	//create image
 	kfr::ImgChunk* chunk = new kfr::ImgChunk("depth frame"); 
@@ -169,9 +169,9 @@ void test_depth_read_write() {
 	}
 	chunk->assign_image((BYTE*)image_bytes, img_length);
 
-	kp.add_depth_chunk(chunk);
+	kp->add_depth_chunk(chunk);
 
-	kfr::ImgChunk* fetched_chunk = kp.get_depth(timestamp);
+	kfr::ImgChunk* fetched_chunk = kp->get_depth(timestamp);
 	
 	/*unsigned int comp_length;
 	unsigned int comp_length_2;
@@ -187,7 +187,7 @@ void test_depth_read_write() {
 
 	bool cmp_result = byte_compare((char*)chunk->image, (char*)fetched_chunk->image, chunk->image_size);
 
-	kp.stop();
+	kp->stop();
 }
 
 void test_frame_fetch() {

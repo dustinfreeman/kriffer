@@ -12,13 +12,3 @@
 
 #pragma once
 
-namespace kfr {
-	int get_num_kinects() {
-		int iSensorCount = 0;
-		HRESULT hr = NuiGetSensorCount(&iSensorCount);
-		return iSensorCount;
-	}
-};
-
-
-

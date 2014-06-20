@@ -28,6 +28,20 @@
 #define KINECT_MAX_USERS 6 
 //I'm annoyed I couldn't find the above in NuiApi.h
 
+namespace kfr {
+	int get_num_kinect_1s() {
+		int iSensorCount = 0;
+		HRESULT hr = NuiGetSensorCount(&iSensorCount);
+		return iSensorCount;
+	}
+	int get_num_kinect_2s() {
+		return 0;
+	}
+	int get_num_kinects() {
+		return get_num_kinect_1s() + get_num_kinect_2s();
+	}
+};
+
 void SignalHandler(int signal)
 {
 	printf("Signal %d",signal);
@@ -44,7 +58,9 @@ namespace kfr {
 	const int CAPTURE_ALL = CAPTURE_DEPTH + CAPTURE_COLOUR + CAPTURE_SKELETON + CAPTURE_AUDIO;
 
 	class KProcessor: public Processor {
-	private:
+		friend class Kriffer;
+
+	protected:
 		bool kinect_opened;
 		int capture_select;
 
@@ -62,7 +78,6 @@ namespace kfr {
 
 		float _last_audio_angle;
 
-	public:
 		int k_index;
 
 		void register_tags() {
@@ -80,11 +95,12 @@ namespace kfr {
 		}
 
 		KProcessor(int _k_index, 
-			std::string _folder = "./", std::string _filename = "capture.dat", 
+			std::string _folder = RFR_DEFAULT_FOLDER, 
+			std::string _filename = RFR_DEFAULT_FILENAME, 
 			int _capture_select= CAPTURE_ALL,
 			bool overwrite = true) 
-			: Processor(_folder, _filename, overwrite),
-			capture_select(_capture_select) {
+			:	Processor(_folder, _filename, overwrite),
+				capture_select(_capture_select) {
 			
 			k_index = _k_index;
 			//-ve k_index indicates not to open a Kinect. for testing.
@@ -154,6 +170,25 @@ namespace kfr {
 					kinect_opened = true;
 				}
 			}
+		}
+
+	public:
+		//factory method =============
+		static KProcessor* get_kinect(int index, std::string folder = RFR_DEFAULT_FOLDER, std::string filename = RFR_DEFAULT_FILENAME, int _capture_select = CAPTURE_ALL, bool overwrite = true) {
+			//indexes Kinect 2s first, then Kinect 1s
+
+			//default, empty processor
+			if (index < 0) {
+				return new KProcessor(-1);
+			}
+
+			if (index < get_num_kinect_2s()) {
+				//TODO return Kinect2 Processor
+			} else if (index < get_num_kinects()) {
+				return new kfr::KProcessor(index, folder, filename, _capture_select, overwrite);
+			}
+
+			return nullptr;
 		}
 		
 		bool isOpened() {
@@ -298,6 +333,7 @@ namespace kfr {
 			pNuiSensor->NuiImageStreamReleaseFrame(depth_stream->streamHandle, &imageFrame);
 
 		}
+
 		void ProcessSkeleton() {
 			//TODO...
 		}
