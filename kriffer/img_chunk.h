@@ -33,7 +33,7 @@ namespace kfr {
 			delete[] image;
 		}
 
-		void assign_image(BYTE* _image, int _size) {
+		void assign_image(void* _image, int _size) {
 			//copies the image into local.
 			if (image)
 				delete image;

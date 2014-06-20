@@ -21,8 +21,8 @@ namespace kfr {
 	class K2Processor: public KProcessor {
 	friend class KrifferTest;
 	
-	static const int FRAME_WIDTH = 512;
-	static const int FRAME_HEIGHT = 424;
+	static const int DEPTH_FRAME_WIDTH = 512;
+	static const int DEPTH_FRAME_HEIGHT = 424;
 	//64:53 ratio. Okay....
 
 	public:
@@ -106,6 +106,98 @@ namespace kfr {
 
 	bool K2Processor::ProcessDepth() {
 		bool got_frame = false;
+
+		IDepthFrame* pDepthFrame = NULL;
+		
+		HRESULT hr = m_pDepthFrameReader->AcquireLatestFrame(&pDepthFrame);
+		if (SUCCEEDED(hr))
+		{
+			INT64 nTime = 0;
+			IFrameDescription* pFrameDescription = NULL;
+			int nWidth = 0;
+			int nHeight = 0;
+			USHORT nDepthMinReliableDistance = 0;
+			USHORT nDepthMaxReliableDistance = 0;
+			UINT nBufferSize = 0;
+			UINT16 *pBuffer = NULL;
+
+			hr = pDepthFrame->get_RelativeTime(&nTime); //can be used for fps stuff.
+
+			if (SUCCEEDED(hr))
+			{
+				hr = pDepthFrame->get_FrameDescription(&pFrameDescription);
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = pFrameDescription->get_Width(&nWidth);
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = pFrameDescription->get_Height(&nHeight);
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = pDepthFrame->get_DepthMinReliableDistance(&nDepthMinReliableDistance);
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = pDepthFrame->get_DepthMaxReliableDistance(&nDepthMaxReliableDistance);
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = pDepthFrame->AccessUnderlyingBuffer(&nBufferSize, &pBuffer);            
+			}
+			if (SUCCEEDED(hr))
+			{
+				//The meat of the processing.
+				//ProcessDepth(nTime, pBuffer, nWidth, nHeight, nDepthMinReliableDistance, nDepthMaxReliableDistance);
+
+				ImgChunk* depthChunk = new ImgChunk("depth frame");
+				add_current_time(depthChunk);
+
+				depthChunk->add_parameter("width", nWidth);
+				depthChunk->add_parameter("height", nHeight);
+
+				//not sure if there is a long-valued kinect timestamp, as with Kinect 1.
+
+				depthChunk->assign_image(pBuffer, (nWidth * nHeight)*sizeof(UINT16));
+
+				// end pixel is start + width*height - 1
+				//const UINT16* pBufferEnd = pBuffer + (nWidth * nHeight);
+				//while (pBuffer < pBufferEnd)
+				//{
+				//	USHORT depth = *pBuffer;
+
+
+				//	//OLD
+				//	// To convert to a byte, we're discarding the most-significant
+				//	// rather than least-significant bits.
+				//	// We're preserving detail, although the intensity will "wrap."
+				//	// Values outside the reliable depth range are mapped to 0 (black).
+
+				//	// Note: Using conditionals in this loop could degrade performance.
+				//	// Consider using a lookup table instead when writing production code.
+				//	/*BYTE intensity = static_cast<BYTE>((depth >= nMinDepth) && (depth <= nMaxDepth) ? (depth % 256) : 0);
+
+				//	pRGBX->rgbRed   = intensity;
+				//	pRGBX->rgbGreen = intensity;
+				//	pRGBX->rgbBlue  = intensity;
+
+				//	++pRGBX;
+				//	*/
+
+				//	++pBuffer;
+				//}
+			
+				add_depth_chunk(depthChunk);
+
+				got_frame = true;
+			}
+
+			SafeRelease(pFrameDescription);
+		}
+
+		SafeRelease(pDepthFrame);
 
 		return got_frame;
 	}

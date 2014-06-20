@@ -85,6 +85,7 @@ namespace kfr {
 
 		virtual bool ProcessColor() { std::cout << "empty kprocessor process called. \n"; return false; }
 
+		void add_depth_chunk(ImgChunk* depthChunk);
 		virtual bool ProcessDepth() { std::cout << "empty kprocessor process called. \n"; return false; }
 
 		virtual bool ProcessAudio() { std::cout << "empty kprocessor process called. \n"; return false; }
@@ -213,5 +214,23 @@ namespace kfr {
 		//stop pushing to capture session and wrap up.
 		//capture session stays open.
 		Processor::stop();
+	}
+
+	void KProcessor::add_depth_chunk(ImgChunk* depthChunk) {
+
+		int olen;
+		char* comp_img = Processor::compress_image(depthChunk, "depth image", &olen,  "LZF");
+		//std::cout << "olen " << olen << "\n";
+
+		if(depthChunk->valid_compression) {
+			cs->add(*depthChunk);
+
+			if (_last_depth != nullptr)
+				delete _last_depth;
+			_last_depth = depthChunk;
+
+		} else {
+			std::cout << "Problem with lzf compression. \n";
+		}
 	}
 };

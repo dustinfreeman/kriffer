@@ -56,7 +56,6 @@ namespace kfr {
 		//Methods from KinectExplorer-D2D
 		bool ProcessColor();
 
-		void add_depth_chunk(ImgChunk* depthChunk);
 		bool ProcessDepth();
 
 		bool ProcessAudio();
@@ -204,24 +203,6 @@ namespace kfr {
 		pNuiSensor->NuiImageStreamReleaseFrame(colour_stream->streamHandle, &imageFrame);
 
 		return got_frame;
-	}
-		
-	void K1Processor::add_depth_chunk(ImgChunk* depthChunk) {
-
-		int olen;
-		char* comp_img = Processor::compress_image(depthChunk, "depth image", &olen,  "LZF");
-		//std::cout << "olen " << olen << "\n";
-
-		if(depthChunk->valid_compression) {
-			cs->add(*depthChunk);
-
-			if (_last_depth != nullptr)
-				delete _last_depth;
-			_last_depth = depthChunk;
-
-		} else {
-			std::cout << "Problem with lzf compression. \n";
-		}
 	}
 
 	bool K1Processor::ProcessDepth() {
