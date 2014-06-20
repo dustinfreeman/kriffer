@@ -86,5 +86,8 @@
     <ClInclude Include="..\kriffer\k1processor.h">
       <Filter>Source Files\kriffer</Filter>
     </ClInclude>
+    <ClInclude Include="..\kriffer\k2processor.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

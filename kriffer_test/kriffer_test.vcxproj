@@ -90,6 +90,7 @@
     <ClInclude Include="..\kriffer\jpg\jpgd.h" />
     <ClInclude Include="..\kriffer\jpg\jpge.h" />
     <ClInclude Include="..\kriffer\k1processor.h" />
+    <ClInclude Include="..\kriffer\k2processor.h" />
     <ClInclude Include="..\kriffer\kprocessor.h" />
     <ClInclude Include="..\kriffer\kriffer.h" />
     <ClInclude Include="..\kriffer\lzfx\getopt.h" />
