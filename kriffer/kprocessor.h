@@ -11,14 +11,6 @@
 
 #include <stdint.h>
 
-#include <NuiApi.h>
-#include <kr_util.h>
-#include <nuistream.h>
-#include <nuidepthstream.h>
-#include <nuicolourstream.h>
-#include <nuiskeletonstream.h>
-#include <nuiaudio.h>
-
 #include "img_chunk.h"
 
 #include "processor.h"
@@ -36,19 +28,7 @@ namespace kfr {
 	const int CAPTURE_SKELETON = 4;
 	const int CAPTURE_AUDIO = 8;
 	const int CAPTURE_ALL = CAPTURE_DEPTH + CAPTURE_COLOUR + CAPTURE_SKELETON + CAPTURE_AUDIO;
-
-	int get_num_kinect_1s() {
-		int iSensorCount = 0;
-		HRESULT hr = NuiGetSensorCount(&iSensorCount);
-		return iSensorCount;
-	}
-	int get_num_kinect_2s() {
-		return 0;
-	}
-	int get_num_kinects() {
-		return get_num_kinect_1s() + get_num_kinect_2s();
-	}
-
+	
 	//below function used to catch audio errors.
 	void SignalHandler(int signal)
 	{

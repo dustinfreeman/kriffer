@@ -2,6 +2,10 @@
 
 namespace kfr {
 
+	int get_num_kinect_2s() {
+		return 0;
+	}
+
 	class K2Processor: public KProcessor {
 	friend class KrifferTest;
 	
@@ -34,6 +38,18 @@ namespace kfr {
 		int _capture_select,
 		bool overwrite) 
 		: KProcessor(_k_index, _folder, _filename, _capture_select, overwrite) {
+
+	}
+
+	void K2Processor::ProcessColor() {
+
+	}
+
+	void K2Processor::ProcessDepth() {
+
+	}
+
+	void K2Processor::ProcessAudio() {
 
 	}
 };

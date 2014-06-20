@@ -1,9 +1,23 @@
+#include <NuiApi.h>
+#include <kr_util.h>
+#include <nuistream.h>
+#include <nuidepthstream.h>
+#include <nuicolourstream.h>
+#include <nuiskeletonstream.h>
+#include <nuiaudio.h>
+
 #include "kprocessor.h"
 
 #define KINECT_MAX_USERS 6 
 //I'm annoyed I couldn't find the above in NuiApi.h
 
 namespace kfr {
+
+	int get_num_kinect_1s() {
+		int iSensorCount = 0;
+		HRESULT hr = NuiGetSensorCount(&iSensorCount);
+		return iSensorCount;
+	}
 
 	class K1Processor: public KProcessor {
 	friend class KrifferTest;
