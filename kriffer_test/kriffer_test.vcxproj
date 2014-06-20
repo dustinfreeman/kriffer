@@ -89,6 +89,7 @@
     <ClInclude Include="..\kriffer\img_chunk.h" />
     <ClInclude Include="..\kriffer\jpg\jpgd.h" />
     <ClInclude Include="..\kriffer\jpg\jpge.h" />
+    <ClInclude Include="..\kriffer\k1processor.h" />
     <ClInclude Include="..\kriffer\kprocessor.h" />
     <ClInclude Include="..\kriffer\kriffer.h" />
     <ClInclude Include="..\kriffer\lzfx\getopt.h" />
@@ -99,7 +100,6 @@
     <ClInclude Include="..\kriffer\nuiskeletonstream.h" />
     <ClInclude Include="..\kriffer\nuistream.h" />
     <ClInclude Include="..\kriffer\utility.h" />
-    <ClInclude Include="k1processor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

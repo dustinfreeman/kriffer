@@ -80,10 +80,10 @@
     <ClInclude Include="..\kriffer\img_chunk.h">
       <Filter>Source Files\kriffer</Filter>
     </ClInclude>
-    <ClInclude Include="k1processor.h">
+    <ClInclude Include="..\kriffer\cvprocessor.h">
       <Filter>Source Files\kriffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\kriffer\cvprocessor.h">
+    <ClInclude Include="..\kriffer\k1processor.h">
       <Filter>Source Files\kriffer</Filter>
     </ClInclude>
   </ItemGroup>
