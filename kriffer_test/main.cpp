@@ -99,7 +99,7 @@ void test_kinect_read_write() {
 	int64_t timestamp = 1;
 	chunk->add_parameter("timestamp", timestamp);
 
-	int width = 640; int height = 480;
+	int width = 640; int height = 480; //assumed frame sizes from Kinect 1.
 	chunk->add_parameter("width", width);
 	chunk->add_parameter("height", height);
 
