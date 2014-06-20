@@ -1,5 +1,7 @@
 #include "kprocessor.h"
 
+#include <Kinect.h>
+
 namespace kfr {
 
 	int get_num_kinect_2s() {
@@ -9,6 +11,10 @@ namespace kfr {
 	class K2Processor: public KProcessor {
 	friend class KrifferTest;
 	
+	static const int FRAME_WIDTH = 512;
+	static const int FRAME_HEIGHT = 424;
+	//64:53 ratio. Okay....
+
 	public:
 		//constructor ==========
 		K2Processor(int _k_index, 
@@ -26,6 +32,8 @@ namespace kfr {
 
 		}
 	protected:
+		// Current Kinect
+		IKinectSensor*          m_pKinectSensor;
 
 		void ProcessColor();
 		void ProcessDepth();
