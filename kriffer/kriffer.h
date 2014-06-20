@@ -27,7 +27,8 @@ KProcessor* KProcessor::get_kinect(int index, std::string folder, std::string fi
 	if (index < get_num_kinect_2s()) {
 		//TODO return Kinect2 Processor
 	} else if (index < get_num_kinects()) {
-		return new kfr::K1Processor(index, folder, filename, _capture_select, overwrite);
+		int k1_index = index - get_num_kinect_2s();
+		return new kfr::K1Processor(k1_index, folder, filename, _capture_select, overwrite);
 	}
 
 	return nullptr;

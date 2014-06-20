@@ -5,9 +5,9 @@
 
 #include <assert.h>
 
-//NOTE: string and int concatenation is easier in C++11 with std::to_string
-
 #include <time.h>
+
+#include <windows.h>
 
 #include <riffer.h>
 #include <kriffer.h>
@@ -61,6 +61,7 @@ public:
 			return;
 
 		int test_duration = 2; //seconds.
+		Sleep(500);
 		time_t start;	time_t end;
 		time(&start);	time(&end);
 		std::cout << "test_kinect_write: Running update() for " << test_duration << " seconds.\n";
@@ -71,6 +72,7 @@ public:
 				std::cout << new_frames;
 			}
 			std::cout << ",";
+			Sleep(10);
 		}
 		std::cout << "\n";
 
@@ -151,7 +153,7 @@ public:
 	static void test_depth_read_write() {
 		//test if depth reads the same as it is written
 
-		kfr::KProcessor* kp = kfr::KProcessor::get_kinect(-1);
+		kfr::K1Processor* kp = new kfr::K1Processor(-1);
 
 		//create image
 		kfr::ImgChunk* chunk = new kfr::ImgChunk("depth frame"); 
@@ -201,6 +203,7 @@ public:
 			return;
 
 		int test_duration = 2; //seconds.
+		Sleep(500);
 		time_t start;	time_t end;
 		time(&start);	time(&end);
 		std::cout << "test_frame_fetch: Running update() for " << test_duration << " seconds.\n";
@@ -211,6 +214,7 @@ public:
 				std::cout << new_frames;
 			}
 			std::cout << ",";
+			Sleep(10);
 		}
 		std::cout << "\n";
 
@@ -242,4 +246,6 @@ int main() {
 	std::cout << "Finished all tests.\n";
 	
 	//while(true) { }
+
+	return 0;
 }
