@@ -27,7 +27,13 @@ struct NuiDepthStream : NuiStream {
 
 		if (SUCCEEDED(hr))
 		{
-			pNuiSensor->NuiImageStreamSetImageFrameFlags(streamHandle, m_nearMode ? NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE : 0);   // Set image flags
+			hr = pNuiSensor->NuiImageStreamSetImageFrameFlags(streamHandle, m_nearMode ? NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE : 0);   // Set image flags
+		}
+
+		if (SUCCEEDED(hr))
+		{
+		} else {
+			std::cout << "had trouble init-ing NuiDepthStream \n";
 		}
 	}
 };
