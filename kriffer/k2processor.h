@@ -8,6 +8,8 @@ namespace kfr {
 	int get_num_kinect_2s() {
 		//the word is that multiple Kinect 2's might not yet be supported
 
+		//in the current version, this function ALWAYS finds a kinect, whether it is connected or not.
+
 		HRESULT hr;
 		IKinectSensor*	m_pKinectSensor;
 		hr = GetDefaultKinectSensor(&m_pKinectSensor);
