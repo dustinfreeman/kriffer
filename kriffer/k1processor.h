@@ -68,7 +68,7 @@ namespace kfr {
 		bool overwrite) 
 		: KProcessor(_k_index, _folder, _filename, _capture_select, overwrite) {
 
-		pNuiSensor = nullptr;
+		pNuiSensor = NULL;
 
 		colour_stream = nullptr;
 		depth_stream = nullptr;
@@ -151,7 +151,7 @@ namespace kfr {
 	bool K1Processor::ProcessColor() {
 		bool got_frame = false;
 
-		if (! WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0))
+		if (!(WAIT_OBJECT_0 == WaitForSingleObject(colour_stream->frameEvent, 0)))
 			return got_frame;
 
 		ImgChunk* colourChunk = new ImgChunk("colour frame");
@@ -208,14 +208,16 @@ namespace kfr {
 	bool K1Processor::ProcessDepth() {
 		bool got_frame = false;
 
-		if (! WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0))
+		if (! (WAIT_OBJECT_0 == WaitForSingleObject(depth_stream->frameEvent, 0)) )
 			return got_frame; 
 
 		ImgChunk* depthChunk = new ImgChunk("depth frame");
 		add_current_time(depthChunk);
 
+		//fetch from sensor.
+
 		NUI_IMAGE_FRAME imageFrame;
-		pNuiSensor->NuiImageStreamGetNextFrame(depth_stream->streamHandle, 0, &imageFrame);
+		hr = pNuiSensor->NuiImageStreamGetNextFrame(depth_stream->streamHandle, 0, &imageFrame);
 		if (FAILED(hr))
 		{
 			std::cout << "Depth's NuiImageStreamGetNextFrame Failed.\n";
