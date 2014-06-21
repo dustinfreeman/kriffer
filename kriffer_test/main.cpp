@@ -67,7 +67,7 @@ public:
 		std::cout << "test_kinect_write: Running update() for " << test_duration << " seconds.\n";
 		while (difftime(end,start) < test_duration) {
 			time(&end);
-			for (int i = 0; i < kp.size(); i++) {
+			for (unsigned int i = 0; i < kp.size(); i++) {
 				std::string new_frames = kp[i]->update();
 				std::cout << new_frames;
 			}
