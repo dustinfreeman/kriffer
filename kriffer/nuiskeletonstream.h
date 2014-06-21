@@ -2,9 +2,9 @@
 #pragma once
 
 struct NuiSkeletonStream : NuiStream {
-	NuiSkeletonStream(INuiSensor * _pNuiSensor) { 
-		pNuiSensor = _pNuiSensor;
-	}
+	NuiSkeletonStream(INuiSensor * _pNuiSensor) :
+		NuiStream(_pNuiSensor)
+	{}
 
 	void init() {
 		// Create an event that will be signaled when depth data is available

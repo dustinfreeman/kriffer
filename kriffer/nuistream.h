@@ -8,10 +8,11 @@ struct NuiStream {
 
 	HRESULT hr;
 
-	NuiStream(INuiSensor * _pNuiSensor = nullptr) 
-		: pNuiSensor(_pNuiSensor) { 
-		frameEvent = nullptr;	
-	}
+	NuiStream(INuiSensor * _pNuiSensor = NULL) 
+		: pNuiSensor(_pNuiSensor),
+		streamHandle(INVALID_HANDLE_VALUE),
+		frameEvent(INVALID_HANDLE_VALUE) 
+	{ }
 
 	void init();
 

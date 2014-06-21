@@ -2,14 +2,12 @@
 #pragma once
 
 struct NuiDepthStream : NuiStream {
-	bool            m_nearMode;
+	bool	m_nearMode;
 
 	NuiDepthStream(INuiSensor * _pNuiSensor):
-		NuiStream(_pNuiSensor)	,
+		NuiStream(_pNuiSensor),
 		m_nearMode(false)
-	{ 
-		pNuiSensor = _pNuiSensor;
-	}
+	{ }
 
 	void init() {
 		// Create an event that will be signaled when depth data is available
