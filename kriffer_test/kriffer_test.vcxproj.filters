@@ -68,9 +68,6 @@
     <ClInclude Include="..\kriffer\nuidepthstream.h">
       <Filter>Source Files\kriffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\kriffer\utility.h">
-      <Filter>Source Files\kriffer</Filter>
-    </ClInclude>
     <ClInclude Include="..\kriffer\lzfx\lzfx.h">
       <Filter>Source Files\kriffer\lzfx</Filter>
     </ClInclude>

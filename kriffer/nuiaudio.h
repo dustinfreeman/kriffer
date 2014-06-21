@@ -2,7 +2,7 @@
 
 #include "audio_buffer.h"
 #include "audio_utils.h"
-#include "WASAPICapture.h"
+//#include "WASAPICapture.h"
 
 //mostly from AudioBasics-D2D
 struct NuiAudio {

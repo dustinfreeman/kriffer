@@ -6,14 +6,15 @@
 
 //Linker -> Input -> Additional Dependencies:  Kinect10.lib;
 
+#pragma once
+
 #include <riffer.h>
+
+#include "cvprocessor.h"
 
 #include "kprocessor.h"
 #include "k1processor.h"
 #include "k2processor.h"
-#include "cvprocessor.h"
-
-#pragma once
 
 namespace kfr {
 	int get_num_kinects() {

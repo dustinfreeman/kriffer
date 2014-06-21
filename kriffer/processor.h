@@ -2,6 +2,7 @@
 
 #include <riffer.h>
 
+#include "img_chunk.h"
 #include "lzfx\lzfx.h"
 
 namespace kfr {

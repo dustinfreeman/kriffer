@@ -11,10 +11,7 @@
 
 #include <stdint.h>
 
-#include "img_chunk.h"
-
 #include "processor.h"
-#include "lzfx\lzfx.h"
 
 #pragma once
 #define KINECT_MAX_USERS 6 
@@ -215,6 +212,8 @@ namespace kfr {
 		//capture session stays open.
 		Processor::stop();
 	}
+
+#include "lzfx\lzfx.h"
 
 	void KProcessor::add_depth_chunk(ImgChunk* depthChunk) {
 
