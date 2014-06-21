@@ -1,5 +1,7 @@
 #pragma once
 
+//copied from stdafx.h found in Kinect SDK 1.8 samples
+
 #define _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES 1
 #include <new>
 #include <windows.h>
