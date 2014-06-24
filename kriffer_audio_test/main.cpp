@@ -30,7 +30,7 @@ int main() {
 
 	std::cout << "Opening Kinect " << kinect_type << "\n";
 
-	Sleep(400);
+	Sleep(1000);
 
 	//start audio
 	char command;

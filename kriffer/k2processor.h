@@ -36,13 +36,8 @@ namespace kfr {
 			bool overwrite = true);
 
 		std::string get_wav_filename() { return "no valid file - k2processor.";  }
-		void start_audio_index(int audio_index) {
-
-		}
-
-		void stop_audio() {
-
-		}
+		void start_audio_index(int audio_index);
+		void stop_audio();
 
 		void stop();
 
@@ -51,6 +46,11 @@ namespace kfr {
 		IKinectSensor*          m_pKinectSensor;
 		// Depth reader
 		IDepthFrameReader*      m_pDepthFrameReader;
+
+		//Audio
+		IStream*                m_pAudioStream;
+		// A single audio beam off the Kinect sensor.
+		IAudioBeam*             m_pAudioBeam;
 
 		bool ProcessColor();
 		bool ProcessDepth();
@@ -75,22 +75,53 @@ namespace kfr {
 
 		if (m_pKinectSensor)
 		{
-			// Initialize the Kinect and get the depth reader
+			//Depth
 			IDepthFrameSource* pDepthFrameSource = NULL;
-
 			hr = m_pKinectSensor->Open();
-
 			if (SUCCEEDED(hr))
 			{
 				hr = m_pKinectSensor->get_DepthFrameSource(&pDepthFrameSource);
 			}
-
 			if (SUCCEEDED(hr))
 			{
 				hr = pDepthFrameSource->OpenReader(&m_pDepthFrameReader);
 			}
-
 			SafeRelease(pDepthFrameSource);
+
+			//Colour
+
+
+
+			//Skeleton
+
+
+
+			//Audio
+			IAudioSource* pAudioSource = NULL;
+			IAudioBeamList* pAudioBeamList = NULL;
+			if (SUCCEEDED(hr))
+			{
+				hr = m_pKinectSensor->get_AudioSource(&pAudioSource);
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = pAudioSource->get_AudioBeams(&pAudioBeamList);
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = pAudioBeamList->OpenAudioBeam(0, &m_pAudioBeam);
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = m_pAudioBeam->OpenInputStream(&m_pAudioStream);
+			}
+			SafeRelease(pAudioBeamList);
+			SafeRelease(pAudioSource);
+			if (FAILED(hr))
+			{
+				std::cout << "Failed opening an audio stream!\n";
+			}
+
 		}
 
 		if (!m_pKinectSensor || FAILED(hr))
@@ -204,9 +235,56 @@ namespace kfr {
 		return got_frame;
 	}
 
+	// Time interval, in milliseconds, for timer that drives audio capture.
+	static const int        cAudioReadTimerInterval = 50;
+	// Audio samples per second in Kinect audio stream
+	static const int        cAudioSamplesPerSecond = 16000;
+	// Number of float samples in the audio beffer we allocate for reading every time the audio capture timer fires
+	// (should be larger than the amount of audio corresponding to cAudioReadTimerInterval msec).
+	static const int        cAudioBufferLength = 2 * cAudioReadTimerInterval * cAudioSamplesPerSecond / 1000;
+
 	bool K2Processor::ProcessAudio() {
 
+		FLOAT audioBuffer[cAudioBufferLength];
+		DWORD cbRead = 0;
+
+		// S_OK will be returned when cbRead == sizeof(audioBuffer).
+		// E_PENDING will be returned when cbRead < sizeof(audioBuffer).
+		// For both return codes we will continue to process the audio written into the buffer.
+		HRESULT hr = m_pAudioStream->Read((void *)audioBuffer, sizeof(audioBuffer), &cbRead);
+
+		if (hr == E_PENDING) {
+			//this most likely means the Kinect 2 is not connected.
+			//std::cout << "hr == E_PENDING \n";
+		}
+		if (FAILED(hr) && hr != E_PENDING)
+		{
+			std::cout << "Failed K2 process audio";
+		}
+		else if (cbRead > 0)
+		{
+			DWORD nSampleCount = cbRead / sizeof(FLOAT);
+			FLOAT fBeamAngle = 0.f;
+			FLOAT fBeamAngleConfidence = 0.f;
+
+			std::cout << "Read " << nSampleCount << " samples.\n";
+
+			// Get most recent audio beam angle and confidence
+			m_pAudioBeam->get_BeamAngle(&fBeamAngle); //radians
+			m_pAudioBeam->get_BeamAngleConfidence(&fBeamAngleConfidence);
+
+			_last_audio_angle = fBeamAngle;
+		}
+
 		return true;
+	}
+
+	void K2Processor::start_audio_index(int audio_index) {
+		//TODO start_audio_index
+	}
+
+	void K2Processor::stop_audio() {
+		//TODO stop_audio
 	}
 
 	void K2Processor::stop() {

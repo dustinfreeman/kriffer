@@ -139,7 +139,7 @@ struct NuiAudio {
         hr = GetMatchingAudioDevice(pNuiSensor, &device);
         if (SUCCEEDED(hr))
         {
-			//formerly, audio recording was initialized here - now separate.
+			//formerly, audio recording was initialized here - now in start_index()
         }
         else
         {

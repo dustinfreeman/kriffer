@@ -263,6 +263,8 @@ namespace kfr {
 	}
 
 	bool K1Processor::ProcessAudio() {
+		//this function only gets audio beam properties. Recording of the buffer is done through nuiaudio.h
+
 		ULONG cbProduced = 0;
 		BYTE *pProduced = NULL;
 		DWORD dwStatus = 0;
@@ -282,7 +284,6 @@ namespace kfr {
 				std::cout << "Failed to process audio output. \n";
 				break;
 			}
-
 			if (hr == S_FALSE)
 			{
 				cbProduced = 0;
@@ -302,8 +303,6 @@ namespace kfr {
 
 				_last_audio_angle = (float)sourceAngle;
 				//std::cout << _last_audio_angle << "\n";
-
-				//output_audio_buffer->write((const char*)pProduced, cbProduced);
 			}
 
 		} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
