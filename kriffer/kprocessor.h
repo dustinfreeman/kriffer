@@ -84,6 +84,9 @@ namespace kfr {
 
 		void add_depth_chunk(ImgChunk* depthChunk);
 		virtual bool ProcessDepth() { std::cout << "empty kprocessor process called. \n"; return false; }
+		virtual int depth_spp() {
+			return 2; //default: one short for depth, another for player id.
+		}
 
 		virtual bool ProcessAudio() { std::cout << "empty kprocessor process called. \n"; return false; }
 	};
@@ -175,7 +178,7 @@ namespace kfr {
 			int w = *depthChunk->get_parameter<int>("width");
 			int h = *depthChunk->get_parameter<int>("height");
 
-			unsigned int image_size = w*h*sizeof(short)*2;
+			unsigned int image_size = w*h*sizeof(short)*depth_spp();
 			unsigned int uolen = image_size*PADDING_FACTOR;
 			void * uncomp_data = malloc(uolen);
 				

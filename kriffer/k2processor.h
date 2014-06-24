@@ -54,6 +54,9 @@ namespace kfr {
 
 		bool ProcessColor();
 		bool ProcessDepth();
+		virtual int depth_spp() {
+			return 1;
+		}
 		bool ProcessAudio();
 	};
 
