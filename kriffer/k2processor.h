@@ -1,7 +1,7 @@
 #include "kprocessor.h"
 
 #include "kr_util.h"
-#include <Kinect.h>
+#include <Kinect.h> //Kinect 2
 
 namespace kfr {
 

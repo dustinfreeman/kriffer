@@ -2,6 +2,9 @@
 
 #include <riffer.h>
 
+#include <time.h>
+#include <windows.h>
+
 #include "img_chunk.h"
 #include "lzfx\lzfx.h"
 
