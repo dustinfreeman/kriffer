@@ -59,7 +59,7 @@ namespace kfr {
 		ImgChunk* get_depth(int64_t ts);
 		ImgChunk* last_depth();
 
-		virtual std::string get_wav_filename() { return "no valid file - kprocessor.";  }
+		virtual std::string get_wav_filename() { return "";  }
 		float last_audio_angle();
 
 		virtual void start_audio_index(int audio_index) { std::cout << "empty kprocessor start_audio_index called. \n";  }

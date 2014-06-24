@@ -143,8 +143,14 @@ namespace kfr {
 		IDepthFrame* pDepthFrame = NULL;
 		
 		HRESULT hr = m_pDepthFrameReader->AcquireLatestFrame(&pDepthFrame);
+
+		//if (hr == E_PENDING)
+		//	std::cout << "ProcessDepth E_PENDING \n";
+
 		if (SUCCEEDED(hr))
 		{
+			//std::cout << "ProcessDepth SUCCEEDED hr \n";
+
 			INT64 nTime = 0;
 			IFrameDescription* pFrameDescription = NULL;
 			int nWidth = 0;
@@ -194,6 +200,10 @@ namespace kfr {
 				//not sure if there is a long-valued kinect timestamp, as with Kinect 1.
 
 				depthChunk->assign_image(pBuffer, (nWidth * nHeight)*sizeof(UINT16));
+
+				//live preview - depends on opencv.
+				//cv::Mat depth_mat(nHeight, nWidth, CV_16UC1, (void*)depthChunk->image);
+				//cv::imshow("k2processor depth", depth_mat);
 
 				// end pixel is start + width*height - 1
 				//const UINT16* pBufferEnd = pBuffer + (nWidth * nHeight);
