@@ -45,15 +45,18 @@ int main() {
 	}
 
 	//loop
-	std::cout << "Recording to... " << kprocessor->get_wav_filename();
-	std::cout << "Press 's' to stop capturing \n";
+	int test_duration = 5;
+	std::cout << "Recording for " << test_duration << "seconds to... " << kprocessor->get_wav_filename() << "\n";
 
-	wchar_t ch;
-	do
-	{
-		ch = _getwch();
+	time_t start;	time_t end;
+	time(&start);	time(&end);
+	while (difftime(end, start) < test_duration) {
+		time(&end);
 		kprocessor->update();
-	} while (L'S' != towupper(ch));
+		Sleep(10);
+	}
+
+	std::cout << "...done.\n";
 
 	//cleanup.
 	kprocessor->stop_audio();
