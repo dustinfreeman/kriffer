@@ -25,7 +25,7 @@ namespace kfr {
 	public:
 
 		//constructor ==========
-		K1Processor(int _k_index, 
+		K1Processor(int _k_index = 0, 
 			std::string _folder = RFR_DEFAULT_FOLDER, 
 			std::string _filename = RFR_DEFAULT_FILENAME, 
 			int _capture_select= CAPTURE_ALL,

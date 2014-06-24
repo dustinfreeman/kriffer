@@ -1,5 +1,7 @@
+#Custom file types
 *.dat
 *.knt
+*.wav
 
 # Compiled Object files
 *.slo

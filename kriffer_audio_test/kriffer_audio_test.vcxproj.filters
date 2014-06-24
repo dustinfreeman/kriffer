@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\kriffer">
+      <UniqueIdentifier>{40a23f95-8743-4959-9f96-38a48d8ea8af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\kriffer\lzfx">
+      <UniqueIdentifier>{54bdbcd1-4754-4171-a6b5-a23bfcaaaaec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\kriffer\jpg">
+      <UniqueIdentifier>{4a5defee-8fb8-4637-b0df-4932a6fd48ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\kriffer\audio">
+      <UniqueIdentifier>{2992023b-3050-47e7-b8ee-71b66a3f8a5c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\lzfx\lzfx.c">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\lzfx\getopt.c">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\jpg\jpge.cpp">
+      <Filter>Source Files\kriffer\jpg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\jpg\jpgd.cpp">
+      <Filter>Source Files\kriffer\jpg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\WASAPICapture.cpp">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kriffer\ResamplerUtil.cpp">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kriffer\kprocessor.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\kriffer.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuistream.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuiskeletonstream.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuicolourstream.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuidepthstream.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\lzfx\lzfx.h">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\lzfx\unistd.h">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\lzfx\getopt.h">
+      <Filter>Source Files\kriffer\lzfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\jpg\jpgd.h">
+      <Filter>Source Files\kriffer\jpg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\jpg\jpge.h">
+      <Filter>Source Files\kriffer\jpg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\img_chunk.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\cvprocessor.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\k1processor.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\k2processor.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\kr_util.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\audio_buffer.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\audio_utils.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\ResamplerUtil.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\WASAPICapture.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kriffer\nuiaudio.h">
+      <Filter>Source Files\kriffer\audio</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
