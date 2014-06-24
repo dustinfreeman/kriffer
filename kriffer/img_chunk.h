@@ -23,6 +23,8 @@ namespace kfr {
 		unsigned int image_size;
 		int width;
 		int height;
+		int bpp;
+
 		bool valid_compression;
 		
 		ImgChunk(std::string _tag_name = NULL_TAG) : Chunk(_tag_name) {
@@ -44,6 +46,8 @@ namespace kfr {
 
 			width = (*this->get_parameter<int>("width"));
 			height = (*this->get_parameter<int>("height"));
+
+			bpp = image_size / width / height;
 		}
 
 		cv::Mat get_mat_image(int smaller_width, int smaller_height, int cv_data_type = CV_8UC4) {
