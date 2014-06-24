@@ -267,7 +267,7 @@ namespace kfr {
 			FLOAT fBeamAngle = 0.f;
 			FLOAT fBeamAngleConfidence = 0.f;
 
-			std::cout << "Read " << nSampleCount << " samples.\n";
+			//std::cout << "Read " << nSampleCount << " samples.\n";
 
 			// Get most recent audio beam angle and confidence
 			m_pAudioBeam->get_BeamAngle(&fBeamAngle); //radians
