@@ -88,6 +88,8 @@ namespace kfr {
 			return 2; //default: one short for depth, another for player id.
 		}
 
+		virtual bool ProcessSkeleton() { return false; }
+
 		virtual bool ProcessAudio() { std::cout << "empty kprocessor process called. \n"; return false; }
 	};
 
@@ -143,19 +145,17 @@ namespace kfr {
 				new_frames << "c";
 		}
 
-		// TO INDEX BETWEEN MULTIPLE FRAME TYPES,
-		//	we will have to adjust indexing so it can filter a specific frame type.
 		if (capture_select & CAPTURE_DEPTH)
 		{
 			if (ProcessDepth())
 				new_frames << "d";
 		}
-		/*
-		if (WAIT_OBJECT_0 == WaitForSingleObject(skeleton_stream->frameEvent, 0))
+		
+		if (capture_select & CAPTURE_SKELETON)
 		{
-			//TODO ProcessSkeleton();
-			new_frames << "s";
-		}*/
+			if (ProcessSkeleton())
+				new_frames << "c";
+		}
 
 		if (new_frames.str().size() == 0)
 			return ""; //should not have to do this. :(
