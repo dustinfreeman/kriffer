@@ -38,8 +38,10 @@ namespace kfr {
 		if (index < get_num_kinect_1s()) {
 			return new kfr::K1Processor(index, folder, filename, _capture_select, overwrite);
 		} else if (index < get_num_kinect_1s() + get_num_kinect_2s()) {
+#ifndef NO_KINECT2
 			int k2_index = index - get_num_kinect_1s();
 			return new kfr::K2Processor(k2_index, folder, filename, _capture_select, overwrite);
+#endif
 		}
 
 		return nullptr;

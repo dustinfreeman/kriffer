@@ -2,14 +2,12 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
 #include <assert.h>
-
 #include <time.h>
-
 #include <windows.h>
 
 #include <riffer.h>
+
 #include <kriffer.h>
 
 //Test helper functions =============================
