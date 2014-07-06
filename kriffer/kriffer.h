@@ -1,3 +1,4 @@
+//General inc & lib requirements.
 //Add to VC++ Directories:
 //Include Directories: $(KINECTSDK10_DIR)\inc;
 //Library Directories: $(KINECTSDK10_DIR)\lib\x86;
