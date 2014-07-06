@@ -14,9 +14,15 @@
 
 #include "kprocessor.h"
 #include "k1processor.h"
-#include "k2processor.h"
+#ifndef NO_KINECT2
+	#include "k2processor.h"
+#endif
 
 namespace kfr {
+#ifdef NO_KINECT2
+	int get_num_kinect_2s() {	return 0;	}
+#endif
+
 	int get_num_kinects() {
 		return get_num_kinect_1s() + get_num_kinect_2s();
 	}
