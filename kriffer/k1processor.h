@@ -31,6 +31,8 @@ namespace kfr {
 			int _capture_select= CAPTURE_ALL,
 			bool overwrite = true);
 
+		int kinect_version() { return 1; }
+
 		std::string get_wav_filename();
 		void start_audio_index(int audio_index) {
 			audio_stream->start_index(audio_index);

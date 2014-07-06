@@ -35,6 +35,8 @@ namespace kfr {
 			int _capture_select= CAPTURE_ALL,
 			bool overwrite = true);
 
+		int kinect_version() { return 2; }
+
 		std::string get_wav_filename() { return "no valid file - k2processor.";  }
 		void start_audio_index(int audio_index);
 		void stop_audio();

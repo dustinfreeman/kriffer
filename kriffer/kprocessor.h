@@ -52,6 +52,8 @@ namespace kfr {
 			int _capture_select= CAPTURE_ALL,
 			bool overwrite = true);
 
+		virtual int kinect_version() { return -1; }
+
 		bool isOpened();
 
 		std::string update();
