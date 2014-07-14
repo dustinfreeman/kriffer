@@ -295,6 +295,7 @@ namespace kfr {
 				audio_stream->buffer.GetBufferAndLength(&pProduced, &cbProduced);
 			}
 
+			_running_avg_audio_volume = 0;
 			if (cbProduced > 0)
 			{
 				double beamAngle, sourceAngle, sourceConfidence;
@@ -305,6 +306,16 @@ namespace kfr {
 
 				_last_audio_angle = (float)sourceAngle;
 				//std::cout << _last_audio_angle << "\n";
+
+				//DO AUDIO PROCESSING
+				float audio_sum = 0;
+				for (int i = 0; i < cbProduced; i += 2) {
+					short audio_sample = (pProduced[i + 1] << 8) + pProduced[i];
+					//NOTE: we're not using any fancy sqrt amplitude calculation.
+					audio_sum += abs(audio_sample);
+				}
+				_running_avg_audio_volume = audio_sum / (cbProduced / 2);
+				//std::cout << "cbProduced " << cbProduced << " audio_sum " << audio_sum << " _running_avg_audio_volume " << _running_avg_audio_volume << "\n";
 			}
 
 		} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);

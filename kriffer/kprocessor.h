@@ -63,6 +63,8 @@ namespace kfr {
 
 		virtual std::string get_wav_filename() { return "";  }
 		float last_audio_angle();
+		virtual void set_running_avg_audio_interval(float seconds) { _running_avg_audio_interval = seconds; }
+		virtual float get_running_avg_audio_volume() { return _running_avg_audio_volume; }
 
 		virtual void start_audio_index(int audio_index) { std::cout << "empty kprocessor start_audio_index called. \n";  }
 		virtual void stop_audio() { std::cout << "empty kprocessor stop_audio called. \n";  }
@@ -77,6 +79,8 @@ namespace kfr {
 		ImgChunk* _last_colour;
 
 		float _last_audio_angle;
+		float _running_avg_audio_interval;
+		float _running_avg_audio_volume;
 
 		int k_index;
 
