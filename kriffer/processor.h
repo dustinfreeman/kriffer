@@ -59,12 +59,14 @@ namespace kfr {
 			if (comp_style == "JPEG") {
 				//expect img_chunk->image to be 4-channel
 				
-				//http://code.google.com/p/jpeg-compressor/
+				jpge::params comp_params;
+				comp_params.m_quality = 95;
 				img_chunk->valid_compression = jpge::compress_image_to_jpeg_file_in_memory(obuf, *olen, 
 					*img_chunk->get_parameter<int>("width"),
 					*img_chunk->get_parameter<int>("height"),
 					NUM_CLR_CHANNELS,
-					img_chunk->image);
+					img_chunk->image,
+					comp_params);
 				//Colour format from Kinect:
 				//http://msdn.microsoft.com/en-us/library/jj131027.aspx
 				//X8R8G8B8
