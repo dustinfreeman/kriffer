@@ -25,9 +25,6 @@
     <Filter Include="Source Files\kriffer\jpge">
       <UniqueIdentifier>{4a5defee-8fb8-4637-b0df-4932a6fd48ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\kriffer\libjpeg-turbo">
-      <UniqueIdentifier>{316b2121-41e0-4963-991e-4cc4a2bebf0e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -118,9 +115,6 @@
     </ClInclude>
     <ClInclude Include="..\kriffer\processor.h">
       <Filter>Source Files\kriffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kriffer\libjpeg-turbo-wrap.h">
-      <Filter>Source Files\kriffer\libjpeg-turbo</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -6,8 +6,9 @@
 #include <windows.h>
 
 #include "img_chunk.h"
+
 #include "lzfx\lzfx.h"
-#include "libjpeg-turbo-wrap.h"
+#include "../../libjpeg-turbo/include/turbojpeg.h"
 
 namespace kfr {
 
@@ -52,8 +53,8 @@ namespace kfr {
 		}
 
 		static char* compress_image(ImgChunk* img_chunk, std::string compress_to_param, int* olen, std::string comp_style = "JPEG") {
+			img_chunk->valid_compression = false;
 			char* comp_img = nullptr;
-			
 			*olen = img_chunk->image_size*PADDING_FACTOR;
 
 			if (comp_style == "JPEG") {
@@ -80,19 +81,33 @@ namespace kfr {
 				//oddly, olen isn't used in opencv!?
 
 				//libjpeg-turbo
-				img_chunk->valid_compression = jpeg::compress(&obuf, 
-					olen,
-					img_chunk->image, 
+				unsigned char* _compressedImage = NULL; //!< Memory is allocated by tjCompress2 if _jpegSize == 0
+				long unsigned int _jpegSize = *olen;
+				tjhandle _jpegCompressor = tjInitCompress();
+				int result = tjCompress2(_jpegCompressor, 
+					img_chunk->image,
 					*img_chunk->get_parameter<int>("width"),
+					0, 
 					*img_chunk->get_parameter<int>("height"),
-					NUM_CLR_CHANNELS);
+					TJPF_RGB,
+					&_compressedImage,
+					&_jpegSize,
+					TJSAMP_444,
+					95,
+					TJFLAG_FASTDCT);
+				img_chunk->valid_compression = (result == 0);
+				*olen = (int)_jpegSize;
 
 				//assign compressed image if valid
 				if (img_chunk->valid_compression) {
 					comp_img = new char[*olen];
-					memcpy(comp_img, &obuf[0], *olen);
+					memcpy(comp_img, _compressedImage, *olen);
+					//memcpy(comp_img, &obuf[0], *olen);
 					img_chunk->add_parameter(compress_to_param, comp_img, *olen); 
 				}
+
+				tjDestroy(_jpegCompressor);
+				tjFree(_compressedImage);
 			}
 
 			if (comp_style == "LZF") {
