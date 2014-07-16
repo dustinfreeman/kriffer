@@ -186,15 +186,12 @@ namespace kfr {
 
 			unsigned int image_size = w*h*sizeof(short)*depth_spp();
 			unsigned int uolen = image_size*PADDING_FACTOR;
-			void * uncomp_data = malloc(uolen);
+			void *uncomp_data = malloc(uolen);
 				
 			int result = lzfx_decompress(comp_data, comp_length, uncomp_data, &uolen);
-			//std::cout << "uncompressed lenght: " << uolen << std::endl;
+			//std::cout << "uncompressed length: " << uolen << std::endl;
 				
-			if (result < 0)
-				depthChunk->valid_compression = false;
-			else
-				depthChunk->valid_compression = true;
+			depthChunk->valid_compression = (result >= 0);
 
 			if (depthChunk->valid_compression) {
 				depthChunk->assign_image((unsigned char*)uncomp_data, image_size);

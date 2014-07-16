@@ -36,7 +36,9 @@ namespace kfr {
 		}
 
 		void assign_image(void* _image, int _size) {
-			//copies the image into local.
+			//copies the image into local, so
+			// _image should be deleted when this is finished if
+			// there is no intention to use it elsewhere.
 			if (image)
 				delete image;
 			

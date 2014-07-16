@@ -179,6 +179,8 @@ namespace kfr {
 					char* error = tjGetErrorStr();
 					std::cout << "libjpeg-turbo error: " << error << "\n";
 				}
+
+				free(uncomp_img);
 			}
 
 			return colourChunk;
