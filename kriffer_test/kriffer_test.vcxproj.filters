@@ -113,5 +113,8 @@
     <ClInclude Include="..\kriffer\nuiaudio.h">
       <Filter>Source Files\kriffer\audio</Filter>
     </ClInclude>
+    <ClInclude Include="..\kriffer\processor.h">
+      <Filter>Source Files\kriffer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

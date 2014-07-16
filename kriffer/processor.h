@@ -61,21 +61,21 @@ namespace kfr {
 				std::vector<unsigned char> obuf(*olen);
 
 				//jpge library
-				//jpge::params comp_params;
-				//comp_params.m_quality = 95;
-				//img_chunk->valid_compression = jpge::compress_image_to_jpeg_file_in_memory(&obuf[0], *olen,
-				//	*img_chunk->get_parameter<int>("width"),
-				//	*img_chunk->get_parameter<int>("height"),
-				//	NUM_CLR_CHANNELS,
-				//	img_chunk->image,
-				//	comp_params);
+				jpge::params comp_params;
+				comp_params.m_quality = 95;
+				img_chunk->valid_compression = jpge::compress_image_to_jpeg_file_in_memory(&obuf[0], *olen,
+					*img_chunk->get_parameter<int>("width"),
+					*img_chunk->get_parameter<int>("height"),
+					NUM_CLR_CHANNELS,
+					img_chunk->image,
+					comp_params);
 				
 				//OpenCV
-				cv::Mat _img(*img_chunk->get_parameter<int>("height"), *img_chunk->get_parameter<int>("width"), CV_8UC4, img_chunk->image);
-				std::vector<int> comp_params;
-				comp_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-				comp_params.push_back(95);
-				img_chunk->valid_compression = cv::imencode(".jpg", _img, obuf, comp_params);
+				//cv::Mat _img(*img_chunk->get_parameter<int>("height"), *img_chunk->get_parameter<int>("width"), CV_8UC4, img_chunk->image);
+				//std::vector<int> comp_params;
+				//comp_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+				//comp_params.push_back(95);
+				//img_chunk->valid_compression = cv::imencode(".jpg", _img, obuf, comp_params);
 
 				//assign compressed image if valid
 				if (img_chunk->valid_compression) {
