@@ -99,6 +99,9 @@ namespace kfr {
 				free(obuf);
 			}
 
+			float comp_ratio = (*olen) / (float)(img_chunk->image_size);
+			//std::cout << "compression ratio: " << comp_style << " " << comp_ratio << "\n";
+
 			return comp_img;
 		}
 
