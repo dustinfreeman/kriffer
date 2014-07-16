@@ -7,8 +7,8 @@
 
 #include "img_chunk.h"
 
-#include "lzfx\lzfx.h"
 #include "../../libjpeg-turbo/include/turbojpeg.h"
+#include "lzfx\lzfx.h"
 
 namespace kfr {
 
@@ -87,9 +87,9 @@ namespace kfr {
 				int result = tjCompress2(_jpegCompressor, 
 					img_chunk->image,
 					*img_chunk->get_parameter<int>("width"),
-					0, 
+					*img_chunk->get_parameter<int>("width")*NUM_CLR_CHANNELS,
 					*img_chunk->get_parameter<int>("height"),
-					TJPF_RGB,
+					TJPF_RGBX,
 					&_compressedImage,
 					&_jpegSize,
 					TJSAMP_444,
@@ -144,21 +144,40 @@ namespace kfr {
 			//std::cout << "getting " << ts << " returning " << *colourChunk->get_parameter<int64_t>("timestamp") << "\n";
 
 			unsigned int comp_length;
-			const unsigned char* comp_data = (unsigned char*)colourChunk->get_parameter_by_tag_as_char_ptr<char*>(tags::get_tag("colour image"), &comp_length); 
+			unsigned char* comp_data = (unsigned char*)colourChunk->get_parameter_by_tag_as_char_ptr<char*>(tags::get_tag("colour image"), &comp_length); 
 
 			if (comp_data) {
 				int w = *colourChunk->get_parameter<int>("width");
 				int h = *colourChunk->get_parameter<int>("height");
-				int actual_comps;
-				unsigned char * uncomp_img = jpgd::decompress_jpeg_image_from_memory(
-					comp_data, 
-					comp_length,
-					&w, &h, &actual_comps, 
-					NUM_CLR_CHANNELS);
 
-				if (uncomp_img) {
+				//jpgd method
+				//int actual_comps;
+				//unsigned char * uncomp_img = jpgd::decompress_jpeg_image_from_memory(
+				//	comp_data, 
+				//	comp_length,
+				//	&w, &h, &actual_comps, 
+				//	NUM_CLR_CHANNELS);
+
+				//turbo-jpeg
+				//http://stackoverflow.com/questions/9094691/examples-or-tutorials-of-using-libjpeg-turbos-turbojpeg
+				unsigned char *uncomp_img = (unsigned char*)malloc(w * h * NUM_CLR_CHANNELS);
+				int jpegSubsamp;
+				tjhandle _jpegDecompressor = tjInitDecompress();
+				//NOTE: we are handling w&h ineffectively here.
+				tjDecompressHeader2(_jpegDecompressor, comp_data, comp_length, &w, &h, &jpegSubsamp);
+				int result = tjDecompress2(_jpegDecompressor, comp_data, comp_length, 
+					uncomp_img, w, w*NUM_CLR_CHANNELS, h, TJPF_RGBX, TJFLAG_FASTDCT);
+				tjDestroy(_jpegDecompressor);
+
+				if (result == 0) {
 					colourChunk->assign_image(uncomp_img, w*h*NUM_CLR_CHANNELS*sizeof(BYTE));
-					delete[] uncomp_img;
+					
+					//cv::Mat uncomp_mat(h, w, CV_8UC4, uncomp_img);
+					//cv::imshow("uncomp_mat", uncomp_mat);
+				}
+				else {
+					char* error = tjGetErrorStr();
+					std::cout << "libjpeg-turbo error: " << error << "\n";
 				}
 			}
 
