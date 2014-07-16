@@ -54,39 +54,46 @@ namespace kfr {
 			char* comp_img = nullptr;
 			
 			*olen = img_chunk->image_size*PADDING_FACTOR;
-			void* obuf = malloc(*olen);
 
 			if (comp_style == "JPEG") {
 				//expect img_chunk->image to be 4-channel
 				
-				jpge::params comp_params;
-				comp_params.m_quality = 95;
-				img_chunk->valid_compression = jpge::compress_image_to_jpeg_file_in_memory(obuf, *olen, 
-					*img_chunk->get_parameter<int>("width"),
-					*img_chunk->get_parameter<int>("height"),
-					NUM_CLR_CHANNELS,
-					img_chunk->image,
-					comp_params);
-				//Colour format from Kinect:
-				//http://msdn.microsoft.com/en-us/library/jj131027.aspx
-				//X8R8G8B8
+				std::vector<unsigned char> obuf(*olen);
 
+				//jpge library
+				//jpge::params comp_params;
+				//comp_params.m_quality = 95;
+				//img_chunk->valid_compression = jpge::compress_image_to_jpeg_file_in_memory(&obuf[0], *olen,
+				//	*img_chunk->get_parameter<int>("width"),
+				//	*img_chunk->get_parameter<int>("height"),
+				//	NUM_CLR_CHANNELS,
+				//	img_chunk->image,
+				//	comp_params);
+				
+				//OpenCV
+				cv::Mat _img(*img_chunk->get_parameter<int>("height"), *img_chunk->get_parameter<int>("width"), CV_8UC4, img_chunk->image);
+				std::vector<int> comp_params;
+				comp_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+				comp_params.push_back(95);
+				img_chunk->valid_compression = cv::imencode(".jpg", _img, obuf, comp_params);
+
+				//assign compressed image if valid
 				if (img_chunk->valid_compression) {
 					comp_img = new char[*olen];
-					memcpy(comp_img, obuf, *olen);
+					memcpy(comp_img, &obuf[0], *olen);
 					img_chunk->add_parameter(compress_to_param, comp_img, *olen); 
 				}
-
-				free(obuf);
 			}
 
 			if (comp_style == "LZF") {
+				void* obuf = malloc(*olen);
+
 				unsigned int uolen;
 				int result = lzfx_compress(img_chunk->image, img_chunk->image_size, obuf, &uolen);
 				*olen = (int)uolen;
-
 				img_chunk->valid_compression = (result >= 0);
 
+				//assign compressed image if valid
 				if (img_chunk->valid_compression) {
 					comp_img = new char[*olen];
 					memcpy(comp_img, obuf, *olen);
