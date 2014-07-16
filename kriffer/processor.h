@@ -111,9 +111,9 @@ namespace kfr {
 			}
 
 			if (comp_style == "LZF") {
-				void* obuf = malloc(*olen);
+				unsigned int uolen = *olen;
+				void *obuf = malloc(uolen);
 
-				unsigned int uolen;
 				int result = lzfx_compress(img_chunk->image, img_chunk->image_size, obuf, &uolen);
 				*olen = (int)uolen;
 				img_chunk->valid_compression = (result >= 0);
