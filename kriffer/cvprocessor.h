@@ -46,9 +46,10 @@ namespace kfr {
 			}
 			*cap >> frame;
 			//frame will come in with 3 channels. We need 4.
-			cv::Mat frame_4 = cv::Mat(frame.rows, frame.cols, CV_8UC4);
+			cv::Mat frame_4 = cv::Mat(frame.rows, frame.cols, CV_8UC4, cv::Scalar(255,255,255,255));
 
-			int from_to[] = { 0,0, 1,1, 2,2};//, 3,3 };
+			//reversed colour mapping.
+			int from_to[] = { 0,2, 1,1, 2,0 };//, 3,3 };
 			cv::mixChannels(&frame, 1, &frame_4, 1, from_to, 3);
 
 			ImgChunk* colourChunk = new ImgChunk("colour frame");
