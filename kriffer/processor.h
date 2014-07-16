@@ -85,10 +85,7 @@ namespace kfr {
 				int result = lzfx_compress(img_chunk->image, img_chunk->image_size, obuf, &uolen);
 				*olen = (int)uolen;
 
-				if (result < 0)
-					img_chunk->valid_compression = false;
-				else
-					img_chunk->valid_compression = true;
+				img_chunk->valid_compression = (result >= 0);
 
 				if (img_chunk->valid_compression) {
 					comp_img = new char[*olen];
