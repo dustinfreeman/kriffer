@@ -52,6 +52,14 @@ namespace kfr {
 			chunk->add_parameter("timestamp", get_current_time());
 		}
 
+		int64_t index_ts(int64_t ts) {
+			//given a ts that doesn't neccesarily correspond exactly to a chunk,
+			//return the timestamp of the closest frame in the index.
+
+			rfr::FileIndexPt<__int64> index_pt = cs->get_index_info(ts);
+			return index_pt.value;
+		}
+
 		static char* compress_image(ImgChunk* img_chunk, std::string compress_to_param, int* olen, std::string comp_style = "JPEG") {
 			img_chunk->valid_compression = false;
 			char* comp_img = nullptr;
