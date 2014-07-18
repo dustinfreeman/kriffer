@@ -58,7 +58,7 @@ namespace kfr {
 
 		std::string update();
 
-		ImgChunk* get_depth(int64_t ts);
+		ImgChunk* get_depth(int64_t ts, ImgChunk* depthChunk);
 		ImgChunk* last_depth();
 
 		virtual std::string get_wav_filename() { return "";  }
@@ -168,8 +168,7 @@ namespace kfr {
 		return new_frames.str();
 	}
 	
-	ImgChunk* KProcessor::get_depth(int64_t ts) {
-		ImgChunk* depthChunk = new ImgChunk();
+	ImgChunk* KProcessor::get_depth(int64_t ts, ImgChunk* depthChunk) {
 		cs->get_by_index(depthChunk, ts, "depth frame"); 
 		//In an ugly hack, we don't need to tag-filter, since we are only adding 
 		// depth frames anyway! Yay!

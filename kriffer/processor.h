@@ -144,8 +144,7 @@ namespace kfr {
 
 		virtual std::string update() = 0;
 
-		ImgChunk* get_colour(int64_t ts) {
-			ImgChunk* colourChunk = new ImgChunk();
+		ImgChunk* get_colour(int64_t ts, ImgChunk* colourChunk = new ImgChunk()) {
 			//std::string tag_filter = tags::get_tag("colour frame");
 			cs->get_by_index(colourChunk, ts, "colour frame"); //, tag_filter);
 
