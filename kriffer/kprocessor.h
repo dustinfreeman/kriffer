@@ -58,7 +58,7 @@ namespace kfr {
 
 		std::string update();
 
-		ImgChunk* get_depth(int64_t ts, ImgChunk* depthChunk);
+		ImgChunk* get_depth(int64_t ts, ImgChunk* depthChunk = new ImgChunk());
 		ImgChunk* last_depth();
 
 		virtual std::string get_wav_filename() { return "";  }
