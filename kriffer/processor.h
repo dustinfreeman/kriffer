@@ -19,10 +19,11 @@ namespace kfr {
 	class Processor {
 	protected:
 		ImgChunk* _last_colour;
-	public:
-		CaptureSession* cs;
+
 		pthread_mutex_t cs_mutex;
 		pthread_t update_thread;
+	public:
+		CaptureSession* cs;
 		bool update_thread_running = true;
 
 		virtual void register_tags() = 0;
@@ -32,6 +33,7 @@ namespace kfr {
 			bool overwrite = true)
 			: update_thread_running(false) 
 		{
+			pthread_mutex_init(&cs_mutex, NULL);
 			cs = new CaptureSession(_folder, _filename, overwrite);
 		}
 
@@ -63,8 +65,10 @@ namespace kfr {
 		int64_t index_ts(int64_t ts) {
 			//given a ts that doesn't neccesarily correspond exactly to a chunk,
 			//return the timestamp of the closest frame in the index.
+			pthread_mutex_lock(&cs_mutex);
+				rfr::FileIndexPt<__int64> index_pt = cs->get_index_info(ts);
+			pthread_mutex_unlock(&cs_mutex);
 
-			rfr::FileIndexPt<__int64> index_pt = cs->get_index_info(ts);
 			return index_pt.value;
 		}
 
@@ -155,8 +159,9 @@ namespace kfr {
 		void start_update_thread();
 
 		ImgChunk* get_colour(int64_t ts, ImgChunk* colourChunk = new ImgChunk()) {
-			//std::string tag_filter = tags::get_tag("colour frame");
-			cs->get_by_index(colourChunk, ts, "colour frame"); //, tag_filter);
+			pthread_mutex_lock(&cs_mutex);
+				cs->get_by_index(colourChunk, ts, "colour frame"); //, tag_filter);
+			pthread_mutex_unlock(&cs_mutex);
 
 			//std::cout << "getting " << ts << " returning " << *colourChunk->get_parameter<int64_t>("timestamp") << "\n";
 
@@ -200,6 +205,7 @@ namespace kfr {
 				free(uncomp_img);
 			}
 
+
 			return colourChunk;
 		}
 
@@ -208,6 +214,8 @@ namespace kfr {
 		}
 
 		virtual void stop() {
+			update_thread_running = false;
+			pthread_join(update_thread, NULL); 
 			cs->close();
 		}
 	};
@@ -217,11 +225,12 @@ namespace kfr {
 		while (processor->update_thread_running) {
 			processor->update();
 		}
+		pthread_exit((void*)0);
 		return NULL;
 	}
 
 	void Processor::start_update_thread() {
-		pthread_mutex_init(&cs_mutex, NULL);
+		update_thread_running = true;
 		pthread_create(&update_thread, NULL, update_loop, (void*)this);
 	}
 };

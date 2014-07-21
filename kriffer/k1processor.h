@@ -188,7 +188,9 @@ namespace kfr {
 			char* comp_img = Processor::compress_image(colourChunk, "colour image", &olen, "JPEG");
 
 			if(colourChunk->valid_compression) {
-				cs->add(*colourChunk);
+				pthread_mutex_lock(&cs_mutex);
+					cs->add(*colourChunk);
+				pthread_mutex_unlock(&cs_mutex);
 
 				//set last colour
 				if (_last_colour != nullptr)

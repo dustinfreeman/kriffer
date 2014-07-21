@@ -94,7 +94,7 @@ namespace kfr {
 			SafeRelease(pDepthFrameSource);
 
 			//Colour
-
+			//don't care at the moment.
 
 
 			//Skeleton

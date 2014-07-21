@@ -169,11 +169,11 @@ namespace kfr {
 	}
 	
 	ImgChunk* KProcessor::get_depth(int64_t ts, ImgChunk* depthChunk) {
-		cs->get_by_index(depthChunk, ts, "depth frame"); 
+		pthread_mutex_lock(&cs_mutex);
+			cs->get_by_index(depthChunk, ts, "depth frame"); 
+		pthread_mutex_unlock(&cs_mutex);
 		//In an ugly hack, we don't need to tag-filter, since we are only adding 
 		// depth frames anyway! Yay!
-
-		//std::cout << depthChunk->params.size() << std::endl;
 
 		//do the uncompression.
 		unsigned int comp_length;
@@ -227,7 +227,9 @@ namespace kfr {
 		//std::cout << "olen " << olen << "\n";
 
 		if(depthChunk->valid_compression) {
-			cs->add(*depthChunk);
+			pthread_mutex_lock(&cs_mutex);
+				cs->add(*depthChunk);
+			pthread_mutex_unlock(&cs_mutex);
 
 			if (_last_depth != nullptr)
 				delete _last_depth;
