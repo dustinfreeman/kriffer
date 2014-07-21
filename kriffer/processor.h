@@ -5,6 +5,8 @@
 #include <time.h>
 #include <windows.h>
 
+#include "pthread\inc\pthread.h"
+
 #include "img_chunk.h"
 
 #include "../../libjpeg-turbo/include/turbojpeg.h"
@@ -17,13 +19,19 @@ namespace kfr {
 	class Processor {
 	protected:
 		ImgChunk* _last_colour;
-
 	public:
 		CaptureSession* cs;
+		pthread_mutex_t cs_mutex;
+		pthread_t update_thread;
+		bool update_thread_running = true;
 
 		virtual void register_tags() = 0;
 
-		Processor(std::string _folder = RFR_DEFAULT_FOLDER, std::string _filename = RFR_DEFAULT_FILENAME, bool overwrite = true) {
+		Processor(std::string _folder = RFR_DEFAULT_FOLDER, 
+			std::string _filename = RFR_DEFAULT_FILENAME, 
+			bool overwrite = true)
+			: update_thread_running(false) 
+		{
 			cs = new CaptureSession(_folder, _filename, overwrite);
 		}
 
@@ -144,6 +152,8 @@ namespace kfr {
 
 		virtual std::string update() = 0;
 
+		void start_update_thread();
+
 		ImgChunk* get_colour(int64_t ts, ImgChunk* colourChunk = new ImgChunk()) {
 			//std::string tag_filter = tags::get_tag("colour frame");
 			cs->get_by_index(colourChunk, ts, "colour frame"); //, tag_filter);
@@ -201,4 +211,18 @@ namespace kfr {
 			cs->close();
 		}
 	};
+
+	void *update_loop(void *p) {
+		Processor *processor = (Processor*)p;
+		while (processor->update_thread_running) {
+			processor->update();
+		}
+		return NULL;
+	}
+
+	void Processor::start_update_thread() {
+		pthread_mutex_init(&cs_mutex, NULL);
+		pthread_create(&update_thread, NULL, update_loop, (void*)this);
+	}
 };
+
