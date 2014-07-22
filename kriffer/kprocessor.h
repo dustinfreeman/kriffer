@@ -140,32 +140,37 @@ namespace kfr {
 	//Methods from KinectExplorer-D2D
 
 	std::string KProcessor::update() {
-		std::ostringstream new_frames;
+		//std::ostringstream new_frames;
 
 		if (capture_select & CAPTURE_AUDIO)
 			ProcessAudio();
 			
 		if (capture_select & CAPTURE_COLOUR)
 		{
-			if (ProcessColor())
-				new_frames << "c";
+			if (ProcessColor()) {
+				//new_frames << "c";
+			}
 		}
 
 		if (capture_select & CAPTURE_DEPTH)
 		{
-			if (ProcessDepth())
-				new_frames << "d";
+			if (ProcessDepth()) {
+				//new_frames << "d";
+			}
 		}
 		
 		if (capture_select & CAPTURE_SKELETON)
 		{
-			if (ProcessSkeleton())
-				new_frames << "c";
+			if (ProcessSkeleton()) {
+				//new_frames << "c";
+			}
 		}
 
-		if (new_frames.str().size() == 0)
-			return ""; //should not have to do this. :(
-		return new_frames.str();
+		return "";
+
+		//if (new_frames.str().size() == 0)
+		//	return ""; //should not have to do this. :(
+		//return new_frames.str();
 	}
 	
 	ImgChunk* KProcessor::get_depth(int64_t ts, ImgChunk* depthChunk) {
