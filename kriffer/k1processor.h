@@ -190,12 +190,10 @@ namespace kfr {
 			if(colourChunk->valid_compression) {
 				pthread_mutex_lock(&cs_mutex);
 					cs->add(*colourChunk);
+					if (_last_colour != nullptr)
+						delete _last_colour;
+					_last_colour = colourChunk;
 				pthread_mutex_unlock(&cs_mutex);
-
-				//set last colour
-				if (_last_colour != nullptr)
-					delete _last_colour;
-				_last_colour = colourChunk;
 			} else {
 				std::cout << "Problem with jpge compression. \n";
 			}

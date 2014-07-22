@@ -205,7 +205,11 @@ namespace kfr {
 	}
 
 	ImgChunk* KProcessor::last_depth() {
-		return _last_depth;
+		ImgChunk* __last_depth = nullptr;
+		pthread_mutex_lock(&cs_mutex);
+			__last_depth = _last_depth;
+		pthread_mutex_unlock(&cs_mutex);
+		return __last_depth;
 	}
 
 	float KProcessor::last_audio_angle() {
@@ -229,11 +233,10 @@ namespace kfr {
 		if(depthChunk->valid_compression) {
 			pthread_mutex_lock(&cs_mutex);
 				cs->add(*depthChunk);
+				if (_last_depth != nullptr)
+					delete _last_depth;
+				_last_depth = depthChunk;
 			pthread_mutex_unlock(&cs_mutex);
-
-			if (_last_depth != nullptr)
-				delete _last_depth;
-			_last_depth = depthChunk;
 
 		} else {
 			std::cout << "Problem with lzf compression. \n";

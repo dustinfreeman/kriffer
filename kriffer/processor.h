@@ -22,6 +22,7 @@ namespace kfr {
 
 		pthread_mutex_t cs_mutex;
 		pthread_t update_thread;
+		pthread_attr_t update_thread_attr;
 	public:
 		CaptureSession* cs;
 		bool update_thread_running = true;
@@ -201,16 +202,17 @@ namespace kfr {
 					char* error = tjGetErrorStr();
 					std::cout << "libjpeg-turbo error: " << error << "\n";
 				}
-
 				free(uncomp_img);
 			}
-
-
 			return colourChunk;
 		}
 
 		ImgChunk* last_colour() {
-			return _last_colour;
+			ImgChunk* __last_colour;
+			pthread_mutex_lock(&cs_mutex);
+				__last_colour = _last_colour;
+			pthread_mutex_unlock(&cs_mutex);
+			return __last_colour;
 		}
 
 		virtual void stop() {
@@ -221,9 +223,12 @@ namespace kfr {
 	};
 
 	void *update_loop(void *p) {
+		//BUG: experienced access violations when running in Debug mode from VS2013
 		Processor *processor = (Processor*)p;
 		while (processor->update_thread_running) {
-			processor->update();
+			std::string update_result = processor->update();
+			//if (update_result.size())
+			//	std::cout << update_result << ",";
 		}
 		pthread_exit((void*)0);
 		return NULL;
@@ -231,7 +236,10 @@ namespace kfr {
 
 	void Processor::start_update_thread() {
 		update_thread_running = true;
-		pthread_create(&update_thread, NULL, update_loop, (void*)this);
+		pthread_attr_init(&update_thread_attr);
+		//no names on Windows, apparently.
+		//pthread_attr_setname_np(&update_thread_attr, "processors_update_t", NULL);
+		pthread_create(&update_thread, &update_thread_attr, update_loop, (void*)this);
 	}
 };
 
