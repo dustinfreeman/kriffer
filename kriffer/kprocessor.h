@@ -11,8 +11,6 @@
 
 #include <stdint.h>
 
-#include "processor.h"
-
 #pragma once
 #define KINECT_MAX_USERS 6 
 //I'm annoyed I couldn't find the above in NuiApi.h
@@ -20,21 +18,7 @@
 namespace kfr {
 	using namespace rfr;
 
-	const int CAPTURE_DEPTH = 1;
-	const int CAPTURE_COLOUR = 2;
-	const int CAPTURE_SKELETON = 4;
-	const int CAPTURE_AUDIO = 8;
-	const int CAPTURE_ALL = CAPTURE_DEPTH + CAPTURE_COLOUR + CAPTURE_SKELETON + CAPTURE_AUDIO;
-	
-	//below function used to catch audio errors.
-	void SignalHandler(int signal)
-	{
-		printf("Signal %d",signal);
-		throw "!Access Violation!";
-	}
-	//typedef void (*SignalHandlerPointer)(int);
-
-	class KProcessor: public Processor {
+	class KProcessor : public AudioProcessor {
 	friend class KrifferTest;
 
 	public:
@@ -104,7 +88,7 @@ namespace kfr {
 		std::string _filename, 
 		int _capture_select,
 		bool overwrite) 
-		:	Processor(_folder, _filename, overwrite),
+		:	AudioProcessor(_folder, _filename, overwrite),
 			capture_select(_capture_select) {
 			
 		k_index = _k_index;

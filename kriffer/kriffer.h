@@ -13,6 +13,8 @@
 
 #include "cvprocessor.h"
 
+#include "sfml_audio_processor.h"
+
 #include "kprocessor.h"
 #include "k1processor.h"
 #ifndef NO_KINECT2

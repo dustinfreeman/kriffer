@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <riffer.h>
 
 #include <time.h>
@@ -13,8 +15,13 @@
 #include "lzfx\lzfx.h"
 
 namespace kfr {
-
 	using namespace rfr;
+
+	const int CAPTURE_DEPTH = 1;
+	const int CAPTURE_COLOUR = 2;
+	const int CAPTURE_SKELETON = 4;
+	const int CAPTURE_AUDIO = 8;
+	const int CAPTURE_ALL = CAPTURE_DEPTH + CAPTURE_COLOUR + CAPTURE_SKELETON + CAPTURE_AUDIO;
 
 	class Processor {
 	protected:
@@ -35,7 +42,11 @@ namespace kfr {
 			: update_thread_running(false) 
 		{
 			pthread_mutex_init(&cs_mutex, NULL);
-			cs = new CaptureSession(_folder, _filename, overwrite);
+
+			if (_filename.size() > 0)
+				cs = new CaptureSession(_folder, _filename, overwrite);
+			else
+				cs = nullptr;
 		}
 
 		~Processor() {
@@ -218,7 +229,8 @@ namespace kfr {
 		virtual void stop() {
 			update_thread_running = false;
 			pthread_join(update_thread, NULL); 
-			cs->close();
+			if (cs)
+				cs->close();
 		}
 	};
 
