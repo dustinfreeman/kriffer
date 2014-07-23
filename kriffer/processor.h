@@ -42,7 +42,7 @@ namespace kfr {
 			: update_thread_running(false) 
 		{
 			pthread_mutex_init(&cs_mutex, NULL);
-			cs = new CaptureSession(_folder, _filename,
+			cs = new CaptureSession(_folder, _filename, overwrite);
 		}
 
 		~Processor() {

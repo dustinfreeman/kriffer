@@ -45,14 +45,6 @@ namespace kfr {
 		ImgChunk* get_depth(int64_t ts, ImgChunk* depthChunk = new ImgChunk());
 		ImgChunk* last_depth();
 
-		virtual std::string get_wav_filename() { return "";  }
-		float last_audio_angle();
-		virtual void set_running_avg_audio_interval(float seconds) { _running_avg_audio_interval = seconds; }
-		virtual float get_running_avg_audio_volume() { return _running_avg_audio_volume; }
-
-		virtual void start_audio_index(int audio_index) { std::cout << "empty kprocessor start_audio_index called. \n";  }
-		virtual void stop_audio() { std::cout << "empty kprocessor stop_audio called. \n";  }
-
 		void stop();
 		
 	protected:
@@ -61,10 +53,6 @@ namespace kfr {
 
 		ImgChunk* _last_depth;
 		ImgChunk* _last_colour;
-
-		float _last_audio_angle;
-		float _running_avg_audio_interval;
-		float _running_avg_audio_volume;
 
 		int k_index;
 
@@ -79,7 +67,7 @@ namespace kfr {
 		}
 
 		virtual bool ProcessSkeleton() { return false; }
-
+		
 		virtual bool ProcessAudio() { std::cout << "empty kprocessor process called. \n"; return false; }
 	};
 
@@ -199,10 +187,6 @@ namespace kfr {
 			__last_depth = _last_depth;
 		pthread_mutex_unlock(&cs_mutex);
 		return __last_depth;
-	}
-
-	float KProcessor::last_audio_angle() {
-		return _last_audio_angle;
 	}
 
 	void KProcessor::stop() {
