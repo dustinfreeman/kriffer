@@ -50,6 +50,7 @@ namespace kfr {
 			height = (*this->get_parameter<int>("height"));
 
 			bpp = image_size / width / height;
+			//std::cout << "BPP: " << bpp << "\n";
 		}
 
 		cv::Mat get_mat_image(int smaller_width, int smaller_height, int cv_data_type = CV_8UC4) {
