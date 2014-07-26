@@ -3,7 +3,7 @@
 
 #include "audio_processor.h"
 
-#include "kfr_sound_buffer_recorder.h"
+//#include "kfr_sound_buffer_recorder.h"
 
 #include <queue>
 
@@ -21,11 +21,11 @@ namespace kfr {
 		void stop_audio();
 
 	protected:
-		kfr::SoundBufferRecorder* recorder;
+		sf::SoundBufferRecorder* recorder;
 		void reset_buffer();
-		bool recording_audio;
-		int64_t last_reset;
-		float reset_interval_s;
+		//bool recording_audio;
+		//int64_t last_reset;
+		//float reset_interval_s;
 
 		std::string current_filename;
 		std::string get_filename(int index) {
@@ -43,27 +43,27 @@ namespace kfr {
 		current_filename = "";
 		
 		recorder = nullptr;
-		recording_audio = false;
-		reset_buffer();
-
-		last_reset = get_current_time();
-		reset_interval_s = 60;
+		
+		//recording_audio = false;
+		//reset_buffer();
+		//last_reset = get_current_time();
+		//reset_interval_s = 60;
 	}
 
 	std::string SFMLAudioProcessor::update() {
-		pthread_mutex_lock(&cs_mutex);
-			_running_avg_audio_volume = recorder->get_running_avg_volume();
-		pthread_mutex_unlock(&cs_mutex);
+		//pthread_mutex_lock(&cs_mutex);
+		//	_running_avg_audio_volume = recorder->get_running_avg_volume();
+		//pthread_mutex_unlock(&cs_mutex);
 
-		if (!recording_audio) {
-			//do audio resets so buffer doesn't get too large.
-			int64_t now = get_current_time();
-			float since_last_reset_s = (now - last_reset) / std::pow(10.0, 7.0);
-			if (since_last_reset_s > reset_interval_s) {
-				reset_buffer();
-				last_reset = now;
-			}
-		}
+		//if (!recording_audio) {
+		//	//do audio resets so buffer doesn't get too large.
+		//	int64_t now = get_current_time();
+		//	float since_last_reset_s = (now - last_reset) / std::pow(10.0, 7.0);
+		//	if (since_last_reset_s > reset_interval_s) {
+		//		reset_buffer();
+		//		last_reset = now;
+		//	}
+		//}
 
 		return "";
 	}
@@ -73,34 +73,33 @@ namespace kfr {
 	}
 
 	void SFMLAudioProcessor::reset_buffer() {
-		pthread_mutex_lock(&cs_mutex);
+		//pthread_mutex_lock(&cs_mutex);
 			//clear out recorder
 			if (recorder) {
 				recorder->stop(); //if not done already.
 				delete recorder;
+				recorder = nullptr;
 			}
-
-			//start new
-			recorder = new kfr::SoundBufferRecorder();
-			recorder->start();
-			recorder->set_running_avg_interval(this->_running_avg_audio_interval);
-		pthread_mutex_unlock(&cs_mutex);
+		//pthread_mutex_unlock(&cs_mutex);
 	}
 
 	void SFMLAudioProcessor::start_audio_index(int audio_index) {
 		current_filename = get_filename(audio_index);
-		recording_audio = true; //blocks occasional buffer reset.
+
 		reset_buffer();
+		recorder = new sf::SoundBufferRecorder();
+		recorder->start();
+		//recorder->set_running_avg_interval(this->_running_avg_audio_interval);
 	}
 
 	void SFMLAudioProcessor::stop_audio() {
-		pthread_mutex_lock(&cs_mutex);
+		//pthread_mutex_lock(&cs_mutex);
 			recorder->stop();
 			recorder->getBuffer().saveToFile(current_filename);
-		pthread_mutex_lock(&cs_mutex);
+		//pthread_mutex_lock(&cs_mutex);
 		
 		current_filename = "";
-		recording_audio = false; //allows occasional buffer reset.
+		//recording_audio = false; //allows occasional buffer reset.
 		reset_buffer();
 		
 	}
