@@ -31,8 +31,20 @@ namespace kfr {
 			image = nullptr;
 			valid_compression = false;
 		}
+
 		~ImgChunk() {
 			delete[] image;
+		}
+
+		kfr::ImgChunk copy() {
+			//returns a copy of this ImgChunk
+			kfr::ImgChunk new_image_chunk(*this);
+
+			unsigned char* copy_image = new unsigned char[image_size];
+			memcpy(copy_image, this->image, image_size);
+
+			new_image_chunk.image = copy_image;
+			return new_image_chunk;
 		}
 
 		void assign_image(void* _image, int _size) {
