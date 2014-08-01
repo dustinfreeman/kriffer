@@ -221,16 +221,20 @@ namespace kfr {
 					cs->add(*depthChunk);
 
 				if (_last_depth != nullptr) {
-					int64_t new_last_depth_time = *_last_depth->get_parameter<int64_t>("timestamp");
-					_last_depth_time_interval = new_last_depth_time - _last_depth_time;
-					_last_depth_time = new_last_depth_time;
+					int64_t *new_last_depth_time = _last_depth->get_parameter<int64_t>("timestamp");
+					//sometimes this is null? Not sure what's going on.
+					if (new_last_depth_time) {
+						_last_depth_time_interval = *new_last_depth_time - _last_depth_time;
+						_last_depth_time = *new_last_depth_time;
+					}
 
 					delete _last_depth;
+					_last_depth == nullptr;
 				}
 
 				_last_depth = depthChunk;
 			
-				pthread_mutex_unlock(&cs_mutex);
+			pthread_mutex_unlock(&cs_mutex);
 
 		} else {
 			std::cout << "Problem with lzf compression. \n";
