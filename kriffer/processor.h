@@ -54,6 +54,14 @@ namespace kfr {
 			delete cs;
 		}
 
+		//these functions used for locking the capture session, or frames from it (like the last one)
+		void lock() {
+			pthread_mutex_lock(&cs_mutex);
+		}
+		void unlock() {
+			pthread_mutex_unlock(&cs_mutex);
+		}
+
 		//returns if capture input source is open, not the capture file.
 		virtual bool isOpened() = 0;
 
@@ -172,9 +180,9 @@ namespace kfr {
 		void start_update_thread();
 
 		ImgChunk* get_colour(int64_t ts, ImgChunk* colourChunk = new ImgChunk()) {
-			pthread_mutex_lock(&cs_mutex);
+			lock();
 				cs->get_by_index(colourChunk, ts, "colour frame"); //, tag_filter);
-			pthread_mutex_unlock(&cs_mutex);
+			unlock();
 
 			//std::cout << "getting " << ts << " returning " << *colourChunk->get_parameter<int64_t>("timestamp") << "\n";
 
