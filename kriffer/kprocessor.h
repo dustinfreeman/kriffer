@@ -205,7 +205,10 @@ namespace kfr {
 
 		if(depthChunk->valid_compression) {
 			pthread_mutex_lock(&cs_mutex);
-				cs->add(*depthChunk);
+
+				if (capturing)
+					cs->add(*depthChunk);
+
 				if (_last_depth != nullptr)
 					delete _last_depth;
 				_last_depth = depthChunk;

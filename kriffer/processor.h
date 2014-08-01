@@ -30,6 +30,8 @@ namespace kfr {
 		pthread_mutex_t cs_mutex;
 		pthread_t update_thread;
 		pthread_attr_t update_thread_attr;
+
+		bool capturing; //if false, we are not putting any frames into the capture session
 	public:
 		CaptureSession* cs;
 		bool update_thread_running = true;
@@ -42,6 +44,9 @@ namespace kfr {
 			: update_thread_running(false) 
 		{
 			pthread_mutex_init(&cs_mutex, NULL);
+
+			capturing = true;
+
 			cs = new CaptureSession(_folder, _filename, overwrite);
 		}
 
@@ -220,6 +225,14 @@ namespace kfr {
 				__last_colour = _last_colour;
 			pthread_mutex_unlock(&cs_mutex);
 			return __last_colour;
+		}
+
+		void start_capture() {
+			capturing = true;
+		}
+
+		void pause_capture() {
+			capturing = false;
 		}
 
 		virtual void stop() {
