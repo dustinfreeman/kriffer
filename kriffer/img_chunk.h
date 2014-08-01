@@ -32,26 +32,26 @@ namespace kfr {
 			valid_compression = false;
 		}
 		//copy constructor
-		ImgChunk(const ImgChunk& other)
-			: Chunk(other) {
+		//ImgChunk(const ImgChunk& other)
+		//	: Chunk(other) {
 
-			this->width = other.width;
-			this->height = other.height;
-			this->bpp = other.bpp;
-			this->image_size = other.image_size;
+		//	this->width = other.width;
+		//	this->height = other.height;
+		//	this->bpp = other.bpp;
+		//	this->image_size = other.image_size;
 
-			if (other.image == nullptr) {
-				this->image == nullptr;
-				this->image_size = 0;
-				valid_compression = false;
-				//this shouldn't happen.
-				return;
-			}
+		//	if (other.image == nullptr) {
+		//		this->image == nullptr;
+		//		this->image_size = 0;
+		//		valid_compression = false;
+		//		//this shouldn't happen.
+		//		return;
+		//	}
 
-			this->image = new unsigned char[image_size];
-			memcpy(this->image, other.image, image_size);
-			valid_compression = true;
-		}
+		//	this->image = new unsigned char[image_size];
+		//	memcpy(this->image, other.image, image_size);
+		//	valid_compression = true;
+		//}
 
 		~ImgChunk() {
 			delete[] image;
