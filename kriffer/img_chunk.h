@@ -19,11 +19,11 @@ namespace kfr {
 		//a struct to hold uncompressed image data, which is not written to disk.
 		//makes no assumption about image format.
 
-		unsigned char* image;
-		unsigned int image_size;
 		int width;
 		int height;
 		int bpp;
+		unsigned int image_size;
+		unsigned char* image;
 
 		bool valid_compression;
 		
@@ -31,20 +31,30 @@ namespace kfr {
 			image = nullptr;
 			valid_compression = false;
 		}
+		//copy constructor
+		ImgChunk(const ImgChunk& other)
+			: Chunk(other) {
+
+			this->width = other.width;
+			this->height = other.height;
+			this->bpp = other.bpp;
+			this->image_size = other.image_size;
+
+			if (other.image == nullptr) {
+				this->image == nullptr;
+				this->image_size = 0;
+				valid_compression = false;
+				//this shouldn't happen.
+				return;
+			}
+
+			this->image = new unsigned char[image_size];
+			memcpy(this->image, other.image, image_size);
+			valid_compression = true;
+		}
 
 		~ImgChunk() {
 			delete[] image;
-		}
-
-		kfr::ImgChunk copy() {
-			//returns a copy of this ImgChunk
-			kfr::ImgChunk new_image_chunk(*this);
-
-			unsigned char* copy_image = new unsigned char[image_size];
-			memcpy(copy_image, this->image, image_size);
-
-			new_image_chunk.image = copy_image;
-			return new_image_chunk;
 		}
 
 		void assign_image(void* _image, int _size) {
