@@ -126,6 +126,9 @@ namespace kfr {
 
 				kinect_opened = true;
 			}
+			else {
+				std::cout << "\tinitialize failed for Kinect " << k_index << "\n";
+			}
 		}
 	}
 	
@@ -189,10 +192,14 @@ namespace kfr {
 
 			if(colourChunk->valid_compression) {
 				pthread_mutex_lock(&cs_mutex);
-					cs->add(*colourChunk);
+
+					if (capturing)
+						cs->add(*colourChunk);
+
 					if (_last_colour != nullptr)
 						delete _last_colour;
 					_last_colour = colourChunk;
+
 				pthread_mutex_unlock(&cs_mutex);
 			} else {
 				std::cout << "Problem with jpge compression. \n";
@@ -294,10 +301,10 @@ namespace kfr {
 			{
 				audio_stream->buffer.GetBufferAndLength(&pProduced, &cbProduced);
 			}
-
-			_running_avg_audio_volume = 0;
+			
 			if (cbProduced > 0)
 			{
+				_running_avg_audio_volume = 0;
 				double beamAngle, sourceAngle, sourceConfidence;
 
 				// Obtain beam angle from INuiAudioBeam afforded by microphone array
@@ -311,14 +318,15 @@ namespace kfr {
 				float audio_sum = 0;
 				for (int i = 0; i < cbProduced; i += 2) {
 					short audio_sample = (pProduced[i + 1] << 8) + pProduced[i];
-					//NOTE: we're not using any fancy sqrt amplitude calculation.
-					audio_sum += abs(audio_sample);
+					audio_sum += sqrt(abs(audio_sample));
 				}
 				_running_avg_audio_volume = audio_sum / (cbProduced / 2);
 				//std::cout << "cbProduced " << cbProduced << " audio_sum " << audio_sum << " _running_avg_audio_volume " << _running_avg_audio_volume << "\n";
 			}
 
 		} while (outputBuffer.dwStatus & DMO_OUTPUT_DATA_BUFFERF_INCOMPLETE);
+
+		//std::cout << "K: get_running_avg_audio_volume " << _running_avg_audio_volume << "\n";
 
 		return true;
 	}

@@ -42,6 +42,8 @@ namespace kfr {
 
 		std::string update();
 
+		float get_last_depth_frame_interval();
+
 		ImgChunk* get_depth(int64_t ts, ImgChunk* depthChunk = new ImgChunk());
 		ImgChunk* last_depth();
 
@@ -52,6 +54,8 @@ namespace kfr {
 		int capture_select;
 
 		ImgChunk* _last_depth;
+		int64_t _last_depth_time;
+		int64_t _last_depth_time_interval;
 		ImgChunk* _last_colour;
 
 		int k_index;
@@ -182,11 +186,18 @@ namespace kfr {
 	}
 
 	ImgChunk* KProcessor::last_depth() {
-		ImgChunk* __last_depth = nullptr;
-		pthread_mutex_lock(&cs_mutex);
-			__last_depth = _last_depth;
-		pthread_mutex_unlock(&cs_mutex);
-		return __last_depth;
+		return _last_depth;
+
+		//ImgChunk* __last_depth = nullptr;
+		//pthread_mutex_lock(&cs_mutex);
+		//	__last_depth = _last_depth;
+		//pthread_mutex_unlock(&cs_mutex);
+		//return __last_depth;
+	}
+
+	float KProcessor::get_last_depth_frame_interval() {
+		//returns last depth interval (to be used for FPS) in seconds
+		return _last_depth_time_interval / pow(10.0, 7.0);
 	}
 
 	void KProcessor::stop() {
@@ -205,10 +216,24 @@ namespace kfr {
 
 		if(depthChunk->valid_compression) {
 			pthread_mutex_lock(&cs_mutex);
-				cs->add(*depthChunk);
-				if (_last_depth != nullptr)
+
+				if (capturing)
+					cs->add(*depthChunk);
+
+				if (_last_depth != nullptr) {
+					int64_t *new_last_depth_time = _last_depth->get_parameter<int64_t>("timestamp");
+					//sometimes this is null? Not sure what's going on.
+					if (new_last_depth_time) {
+						_last_depth_time_interval = *new_last_depth_time - _last_depth_time;
+						_last_depth_time = *new_last_depth_time;
+					}
+
 					delete _last_depth;
+					_last_depth == nullptr;
+				}
+
 				_last_depth = depthChunk;
+			
 			pthread_mutex_unlock(&cs_mutex);
 
 		} else {

@@ -1,6 +1,8 @@
 kriffer
 =======
 
-A framework for storing Windows Kinect data in riffer: https://github.com/dustinfreeman/riffer
+A framework for storing Kinect, Generic Camera, and audio data in riffer: https://github.com/dustinfreeman/riffer
 
-Currently using the Kinect Windows SDK v1.8, for no particularly enlightening reason. One of the main reasons for this is to hide the unweildy-ness of the Windows SDK in its glorious C++-ness
+To to pull data off the Kinect 1, we use the Kinect Windows SDK v1.8, for the Kinect 2, we are using the private preview SDK. These are both accessed 
+
+Skeleton streams not supported.
