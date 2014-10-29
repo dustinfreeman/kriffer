@@ -263,7 +263,7 @@ DWORD CWASAPICapture::DoCaptureThread()
         return hr;
     }
 
-    mmcssHandle = AvSetMmThreadCharacteristics(L"Audio", &mmcssTaskIndex);
+	mmcssHandle = AvSetMmThreadCharacteristicsW(L"Audio", &mmcssTaskIndex);
     if (mmcssHandle == NULL)
     {
         printf_s("Unable to enable MMCSS on capture thread: %d\n", GetLastError());

@@ -4,6 +4,8 @@
 #include "audio_utils.h"
 //#include "WASAPICapture.h"
 
+
+
 //mostly from AudioBasics-D2D
 struct NuiAudio {
 	INuiSensor* pNuiSensor;
@@ -154,32 +156,33 @@ struct NuiAudio {
 		StringCchPrintfW(waveFileName, _countof(waveFileName), L"%snuiaudio-%i.wav", stemp.c_str(), audio_index);
 
 		// Create the wave file that will contain audio data
-			waveFile = CreateFile(waveFileName, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, 
-                FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, 
-                NULL);
-            if (INVALID_HANDLE_VALUE != waveFile)
+		waveFile = CreateFileW(waveFileName, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, 
+            NULL);
+
+        if (INVALID_HANDLE_VALUE != waveFile)
+        {
+            //  Instantiate a capturer
+            capturer = new (std::nothrow) CWASAPICapture(device);
+            if ((NULL != capturer) && capturer->Initialize(TargetLatency))
             {
-                //  Instantiate a capturer
-                capturer = new (std::nothrow) CWASAPICapture(device);
-                if ((NULL != capturer) && capturer->Initialize(TargetLatency))
+                hr = CaptureAudio(capturer, waveFile, waveFileName);
+                if (FAILED(hr))
                 {
-                    hr = CaptureAudio(capturer, waveFile, waveFileName);
-                    if (FAILED(hr))
-                    {
-                        printf_s("Unable to capture audio data.\n");
-                    }
-                }
-                else
-                {
-                    printf_s("Unable to initialize capturer.\n");
-                    hr = E_FAIL;
+                    printf_s("Unable to capture audio data.\n");
                 }
             }
             else
             {
-                printf_s("Unable to create output WAV file %S.\nAnother application might be using this file.\n", waveFileName);
+                printf_s("Unable to initialize capturer.\n");
                 hr = E_FAIL;
             }
+        }
+        else
+        {
+            printf_s("Unable to create output WAV file %S.\nAnother application might be using this file.\n", waveFileName);
+            hr = E_FAIL;
+        }
 	}
 
 	void stop_audio() {
