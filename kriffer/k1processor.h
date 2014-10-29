@@ -318,7 +318,7 @@ namespace kfr {
 				float audio_sum = 0;
 				for (int i = 0; i < cbProduced; i += 2) {
 					short audio_sample = (pProduced[i + 1] << 8) + pProduced[i];
-					audio_sum += sqrt(abs(audio_sample));
+					audio_sum += (float)sqrt(abs(audio_sample));
 				}
 				_running_avg_audio_volume = audio_sum / (cbProduced / 2);
 				//std::cout << "cbProduced " << cbProduced << " audio_sum " << audio_sum << " _running_avg_audio_volume " << _running_avg_audio_volume << "\n";

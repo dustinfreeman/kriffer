@@ -197,7 +197,7 @@ namespace kfr {
 
 	float KProcessor::get_last_depth_frame_interval() {
 		//returns last depth interval (to be used for FPS) in seconds
-		return _last_depth_time_interval / pow(10.0, 7.0);
+		return _last_depth_time_interval / (float)pow(10.0, 7.0);
 	}
 
 	void KProcessor::stop() {
@@ -229,7 +229,7 @@ namespace kfr {
 					}
 
 					delete _last_depth;
-					_last_depth == nullptr;
+					_last_depth = nullptr;
 				}
 
 				_last_depth = depthChunk;
