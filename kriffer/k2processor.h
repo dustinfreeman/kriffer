@@ -1,3 +1,4 @@
+#ifndef NO_KINECT2
 #include "kprocessor.h"
 
 #include "kr_util.h"
@@ -314,3 +315,5 @@ namespace kfr {
 		SafeRelease(m_pKinectSensor);
 	}
 };
+
+#endif
