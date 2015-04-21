@@ -56,8 +56,7 @@ namespace kfr {
 		ImgChunk* _last_depth;
 		int64_t _last_depth_time;
 		int64_t _last_depth_time_interval;
-		ImgChunk* _last_colour;
-
+		
 		int k_index;
 
 		void register_tags();
