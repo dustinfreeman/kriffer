@@ -296,11 +296,9 @@ namespace kfr {
 	}
 
 	void K2Processor::start_audio_index(int audio_index) {
-		//TODO start_audio_index
 	}
 
 	void K2Processor::stop_audio() {
-		//TODO stop_audio
 	}
 
 	void K2Processor::stop() {
